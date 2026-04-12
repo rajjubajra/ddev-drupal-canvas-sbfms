@@ -154,13 +154,22 @@ export default function JournalEntriesList() {
                             })
                         ]
                     }),
-                    /*#__PURE__*/ _jsx("div", {
-                        children: /*#__PURE__*/ _jsx("button", {
-                            onClick: exportJournalCSV,
-                            children: /*#__PURE__*/ _jsx(Button, {
-                                children: "Export CSV"
+                    /*#__PURE__*/ _jsxs("div", {
+                        className: "flex flex-wrap gap-2",
+                        children: [
+                            /*#__PURE__*/ _jsx("button", {
+                                onClick: exportJournalCSV,
+                                children: /*#__PURE__*/ _jsx(Button, {
+                                    children: "Export CSV"
+                                })
+                            }),
+                            /*#__PURE__*/ _jsx("a", {
+                                href: "/admin/journal-import",
+                                children: /*#__PURE__*/ _jsx(Button, {
+                                    children: "Import CSV"
+                                })
                             })
-                        })
+                        ]
                     })
                 ]
             }),

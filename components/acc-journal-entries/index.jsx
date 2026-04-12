@@ -214,11 +214,14 @@ console.log('JOurnal DATA', data, error, isLoading);
             value={itemPerPage} 
             onChange={(e) => setItemPerPage(e.target.value)} />
         </div>
-        <div>
+        <div className='flex flex-wrap gap-2'>
           <button 
           onClick={exportJournalCSV}>
             <Button>Export CSV</Button>
           </button>
+          <a href='/admin/journal-import'>
+            <Button>Import CSV</Button>
+          </a>
         </div>
       </div>
 
