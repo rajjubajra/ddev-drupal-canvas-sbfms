@@ -6,10 +6,11 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *  - THIS IS JUST FOR number format
  *  - Currency Name
  *   
- */ const Amount = ({ amt })=>{
+ */ const AmountTotal = ({ amt })=>{
     return /*#__PURE__*/ _jsx("div", {
-        className: "text-sm w-full text-right",
+        className: "text-sm text-blue-600 w-full text-right",
         children: /*#__PURE__*/ _jsxs("span", {
+            className: "font-bold",
             children: [
                 " ",
                 Number(amt).toFixed(2)
@@ -17,4 +18,4 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
         })
     });
 };
-export default Amount;
+export default AmountTotal;

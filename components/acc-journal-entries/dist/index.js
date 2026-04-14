@@ -5,7 +5,7 @@ import { JsonApiClient, FormattedText, Image } from 'drupal-canvas';
 import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 import Button from '@/components/utl-button';
 import PageTitle from '@/components/utl-page-title';
-import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 /* --------------------------------------------------
    Drupal JSON:API Client
 -------------------------------------------------- */ const client = new JsonApiClient();
@@ -136,45 +136,54 @@ export default function JournalEntriesList() {
             /*#__PURE__*/ _jsxs("div", {
                 className: "w-full flex justify-end mb-4",
                 children: [
-                    /*#__PURE__*/ _jsx("a", {
-                        href: "/node/add/acc_journal_entry",
-                        children: /*#__PURE__*/ _jsx(Button, {
-                            children: "Create Journal Entry"
-                        })
-                    }),
                     /*#__PURE__*/ _jsxs("div", {
-                        className: "mx-2 relative top-4",
+                        className: "w-full flex flex-wrap gap-2",
                         children: [
-                            "Items Per page:",
-                            /*#__PURE__*/ _jsx("input", {
-                                className: "w-24 ml-4 border p-2",
-                                type: "number",
-                                value: itemPerPage,
-                                onChange: (e)=>setItemPerPage(e.target.value)
+                            /*#__PURE__*/ _jsx("div", {
+                                children: /*#__PURE__*/ _jsx("a", {
+                                    href: "/node/add/acc_journal_entry",
+                                    children: /*#__PURE__*/ _jsx(Button, {
+                                        children: "Create Journal Entry"
+                                    })
+                                })
+                            }),
+                            /*#__PURE__*/ _jsxs("div", {
+                                className: "flex flex-wrap gap-2",
+                                children: [
+                                    /*#__PURE__*/ _jsx(Button, {
+                                        children: /*#__PURE__*/ _jsx("button", {
+                                            onClick: exportJournalCSV,
+                                            children: "Export CSV"
+                                        })
+                                    }),
+                                    /*#__PURE__*/ _jsx(Button, {
+                                        children: /*#__PURE__*/ _jsx("a", {
+                                            href: "/admin/content/csv-to-journal-entry",
+                                            children: "Import CSV"
+                                        })
+                                    })
+                                ]
                             })
                         ]
                     }),
                     /*#__PURE__*/ _jsxs("div", {
-                        className: "flex flex-wrap gap-2",
+                        className: "mx-2 relative top-4",
                         children: [
-                            /*#__PURE__*/ _jsx("button", {
-                                onClick: exportJournalCSV,
-                                children: /*#__PURE__*/ _jsx(Button, {
-                                    children: "Export CSV"
-                                })
+                            /*#__PURE__*/ _jsx("div", {
+                                children: "Items Per page:"
                             }),
-                            /*#__PURE__*/ _jsx("a", {
-                                href: "/admin/journal-import",
-                                children: /*#__PURE__*/ _jsx(Button, {
-                                    children: "Import CSV"
-                                })
+                            /*#__PURE__*/ _jsx("input", {
+                                className: "w-24 border p-2",
+                                type: "number",
+                                value: itemPerPage,
+                                onChange: (e)=>setItemPerPage(e.target.value)
                             })
                         ]
                     })
                 ]
             }),
             /*#__PURE__*/ _jsxs("form", {
-                className: "flex flex-wrap gap-4 items-end mb-6 p-4 border rounded",
+                className: "flex flex-wrap gap-4 items-end mb-6 p-4 mx-2 border",
                 onSubmit: (e)=>e.preventDefault(),
                 children: [
                     /*#__PURE__*/ _jsxs("div", {
@@ -277,7 +286,7 @@ export default function JournalEntriesList() {
                                                         children: entry.field_debit_account.field_ledger_account_name
                                                     })
                                                 }),
-                                                /*#__PURE__*/ _jsx(Amount, {
+                                                /*#__PURE__*/ _jsx(AmountTotal, {
                                                     amt: entry.field_amount
                                                 })
                                             ]
@@ -299,7 +308,7 @@ export default function JournalEntriesList() {
                                                         children: entry.field_credit_account.field_ledger_account_name
                                                     })
                                                 }),
-                                                /*#__PURE__*/ _jsx(Amount, {
+                                                /*#__PURE__*/ _jsx(AmountTotal, {
                                                     amt: entry.field_amount
                                                 })
                                             ]

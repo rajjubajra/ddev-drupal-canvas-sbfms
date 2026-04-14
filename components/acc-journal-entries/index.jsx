@@ -7,7 +7,7 @@ import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 
 import Button from '@/components/utl-button';
 import PageTitle from '@/components/utl-page-title';
-import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 
 /* --------------------------------------------------
    Drupal JSON:API Client
@@ -203,25 +203,31 @@ console.log('JOurnal DATA', data, error, isLoading);
  */}
       {/* Actions */}
       <div className="w-full flex justify-end mb-4">
-        <a href="/node/add/acc_journal_entry">
-          <Button>Create Journal Entry</Button>
-        </a>
+        <div className='w-full flex flex-wrap gap-2'>
+          <div>
+            <a href="/node/add/acc_journal_entry">
+            <Button>Create Journal Entry</Button>
+            </a>
+          </div>
+          <div className='flex flex-wrap gap-2'>
+            <Button><button 
+            onClick={exportJournalCSV}>
+              Export CSV
+            </button></Button>
+            <Button>
+            <a href='/admin/content/csv-to-journal-entry'>
+              Import CSV
+            </a>
+            </Button>
+          </div>
+        </div>
         <div className='mx-2 relative top-4'>
-          Items Per page:
+          <div>Items Per page:</div>
           <input 
-            className='w-24 ml-4 border p-2' 
+            className='w-24 border p-2' 
             type='number' 
             value={itemPerPage} 
             onChange={(e) => setItemPerPage(e.target.value)} />
-        </div>
-        <div className='flex flex-wrap gap-2'>
-          <button 
-          onClick={exportJournalCSV}>
-            <Button>Export CSV</Button>
-          </button>
-          <a href='/admin/journal-import'>
-            <Button>Import CSV</Button>
-          </a>
         </div>
       </div>
 
@@ -231,7 +237,7 @@ console.log('JOurnal DATA', data, error, isLoading);
       Date Filter Form 
       ------------------------------------------------------*/}
       <form
-        className="flex flex-wrap gap-4 items-end mb-6 p-4 border rounded"
+        className="flex flex-wrap gap-4 items-end mb-6 p-4 mx-2 border"
         onSubmit={(e) => e.preventDefault()}
       >
         <div>
@@ -310,7 +316,7 @@ console.log('JOurnal DATA', data, error, isLoading);
                   }
                   </a>
                 </div>
-                <Amount amt={entry.field_amount} />
+                <AmountTotal amt={entry.field_amount} />
               </div>
             </div>
             
@@ -325,7 +331,7 @@ console.log('JOurnal DATA', data, error, isLoading);
                   }
                   </a>
                 </div>
-                <Amount amt={entry.field_amount} />
+                <AmountTotal amt={entry.field_amount} />
               </div>
             </div> 
           </div>

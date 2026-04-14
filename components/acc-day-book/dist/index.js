@@ -40,21 +40,51 @@ export default function DayBook() {
         datePickedFrom,
         datePickedTo
     ]);
+    /**--------------------------------------- 
+            PAGENATION 
+      -------------------------------------------**/ const [page, setPage] = useState(0);
+    const [itemPerPage, setItemPerPage] = useState(20);
+    const ITEMS_PER_PAGE = itemPerPage;
+    const offset = page * ITEMS_PER_PAGE;
+    useEffect(()=>{
+        console.log('PAGE CHANGED:', page, 'OFFSET:', offset);
+    }, [
+        page,
+        offset
+    ]);
+    const handleDateFromChange = (e)=>{
+        const value = e.target.value;
+        setDatePickedFrom(value);
+        setDateFrom(value);
+        setPage(0);
+    };
+    const handleDateToChange = (e)=>{
+        const value = e.target.value;
+        setDatePickedTo(value);
+        setDateTo(value);
+        setPage(0);
+    };
+    const handleItemsPerPageChange = (e)=>{
+        const value = Math.max(Number(e.target.value) || 1, 1);
+        setItemPerPage(value);
+        setPage(0);
+    };
     /* --------------------------------------------------
      Fetch: Journal Entries (filtered by date range)
   -------------------------------------------------- */ const { data, error, isLoading } = useSWR([
         'node--acc_journal_entry',
         dateFrom,
         dateTo,
+        page,
         {
             queryString: new DrupalJsonApiParams().addInclude([
                 'field_credit_account.field_account_type',
                 'field_debit_account.field_account_type'
             ]).addFilter('field_date', dateFrom, '>=').addFilter('field_date', dateTo, '<=').addSort([
                 '-field_date'
-            ]).getQueryString()
+            ]).addPageLimit(ITEMS_PER_PAGE).addPageOffset(offset).getQueryString()
         }
-    ], ([type, , , options])=>client.getCollection(type, options));
+    ], ([type, , , , options])=>client.getCollection(type, options));
     /* --------------------------------------------------
      Export filtered data to CSV
   -------------------------------------------------- */ const exportToCSV = ()=>{
@@ -102,21 +132,44 @@ export default function DayBook() {
     /* --------------------------------------------------
      Render UI
   -------------------------------------------------- */ return /*#__PURE__*/ _jsxs("div", {
+        className: "space-y-6",
         children: [
-            /*#__PURE__*/ _jsx("div", {
-                className: "flex gap-10 items-center mb-4",
-                children: /*#__PURE__*/ _jsx("button", {
-                    onClick: exportToCSV,
-                    children: /*#__PURE__*/ _jsx(Button, {
-                        children: "Export CSV"
+            /*#__PURE__*/ _jsxs("div", {
+                className: "flex flex-col gap-4 rounded-lg border border-slate-200 p-4 sm:flex-row sm:items-end sm:justify-between",
+                children: [
+                    /*#__PURE__*/ _jsx("div", {
+                        className: "flex flex-wrap items-center gap-3",
+                        children: /*#__PURE__*/ _jsx("button", {
+                            onClick: exportToCSV,
+                            children: /*#__PURE__*/ _jsx(Button, {
+                                children: "Export CSV"
+                            })
+                        })
+                    }),
+                    /*#__PURE__*/ _jsxs("div", {
+                        className: "w-full sm:w-auto",
+                        children: [
+                            /*#__PURE__*/ _jsx("label", {
+                                className: "mb-1 block text-sm font-semibold text-slate-700",
+                                children: "Items Per Page"
+                            }),
+                            /*#__PURE__*/ _jsx("input", {
+                                className: "w-full rounded border border-slate-300 px-3 py-2 sm:w-28",
+                                type: "number",
+                                min: "1",
+                                value: itemPerPage,
+                                onChange: handleItemsPerPageChange
+                            })
+                        ]
                     })
-                })
+                ]
             }),
             /*#__PURE__*/ _jsxs("form", {
-                className: "flex flex-wrap gap-4 mb-6 p-4 border",
+                className: "grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-2 lg:grid-cols-3",
                 onSubmit: (e)=>e.preventDefault(),
                 children: [
                     /*#__PURE__*/ _jsxs("div", {
+                        className: "w-full",
                         children: [
                             /*#__PURE__*/ _jsx("label", {
                                 className: "block text-sm font-semibold mb-1",
@@ -125,12 +178,13 @@ export default function DayBook() {
                             /*#__PURE__*/ _jsx("input", {
                                 type: "date",
                                 value: dateFrom,
-                                onChange: (e)=>setDateFrom(e.target.value),
-                                className: "border px-2 py-1 rounded"
+                                onChange: handleDateFromChange,
+                                className: "w-full rounded border border-slate-300 px-3 py-2"
                             })
                         ]
                     }),
                     /*#__PURE__*/ _jsxs("div", {
+                        className: "w-full",
                         children: [
                             /*#__PURE__*/ _jsx("label", {
                                 className: "block text-sm font-semibold mb-1",
@@ -139,8 +193,8 @@ export default function DayBook() {
                             /*#__PURE__*/ _jsx("input", {
                                 type: "date",
                                 value: dateTo,
-                                onChange: (e)=>setDateTo(e.target.value),
-                                className: "border px-2 py-1 rounded"
+                                onChange: handleDateToChange,
+                                className: "w-full rounded border border-slate-300 px-3 py-2"
                             })
                         ]
                     })
@@ -149,90 +203,210 @@ export default function DayBook() {
             /*#__PURE__*/ _jsx(PageTitle, {
                 title: "Day Book"
             }),
-            /*#__PURE__*/ _jsxs("div", {
-                className: "flex text-xs uppercase gap-1",
-                children: [
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-28 border-b",
-                        children: "Date"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-52 border-b",
-                        children: "Title"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-52 border-b",
-                        children: "Debit Ledger Name"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-28 border-b",
-                        children: "Account Type"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-52 border-b",
-                        children: "Credit Ledger Name"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-28 border-b",
-                        children: "Account Type"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-28 border-b",
-                        children: "Amount"
-                    }),
-                    /*#__PURE__*/ _jsx("div", {
-                        className: "w-28 border-b",
-                        children: "Link to Journal"
-                    })
-                ]
-            }),
             (data === null || data === void 0 ? void 0 : data.length) === 0 && /*#__PURE__*/ _jsx("div", {
                 className: "mt-4 text-gray-500",
                 children: "No entries found"
             }),
-            data === null || data === void 0 ? void 0 : data.map((entry)=>/*#__PURE__*/ _jsxs("div", {
-                    className: "flex text-sm gap-1",
-                    children: [
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-28 border-b",
-                            children: entry.field_date
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-52 border-b",
-                            children: entry.title
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-52 border-b",
-                            children: entry.field_debit_account.field_ledger_account_name
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-28 border-b",
-                            children: entry.field_debit_account.field_account_type.name
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-52 border-b",
-                            children: entry.field_credit_account.field_ledger_account_name
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-28 border-b",
-                            children: entry.field_credit_account.field_account_type.name
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-28 border-b",
-                            children: /*#__PURE__*/ _jsx(Amount, {
-                                amt: entry.field_amount
+            /*#__PURE__*/ _jsx("div", {
+                className: "space-y-4 md:hidden",
+                children: data === null || data === void 0 ? void 0 : data.map((entry)=>/*#__PURE__*/ _jsxs("div", {
+                        className: "rounded-xl border border-slate-200 bg-white p-4 shadow-sm",
+                        children: [
+                            /*#__PURE__*/ _jsxs("div", {
+                                className: "mb-3 flex items-start justify-between gap-3",
+                                children: [
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        children: [
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "text-xs font-semibold uppercase tracking-wide text-slate-500",
+                                                children: entry.field_date
+                                            }),
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "text-base font-semibold text-slate-900",
+                                                children: entry.title
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ _jsx("a", {
+                                        className: "shrink-0 rounded border border-slate-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-slate-50",
+                                        href: `/acc-journal-entry/?nodeId=${entry.drupal_internal__nid}`,
+                                        children: "JRN"
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ _jsxs("div", {
+                                className: "space-y-3 text-sm",
+                                children: [
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        className: "rounded-lg bg-slate-50 p-3",
+                                        children: [
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "text-xs font-semibold uppercase tracking-wide text-slate-500",
+                                                children: "Debit"
+                                            }),
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "mt-1 font-medium text-slate-900",
+                                                children: entry.field_debit_account.field_ledger_account_name
+                                            }),
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "text-slate-600",
+                                                children: entry.field_debit_account.field_account_type.name
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        className: "rounded-lg bg-slate-50 p-3",
+                                        children: [
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "text-xs font-semibold uppercase tracking-wide text-slate-500",
+                                                children: "Credit"
+                                            }),
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "mt-1 font-medium text-slate-900",
+                                                children: entry.field_credit_account.field_ledger_account_name
+                                            }),
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "text-slate-600",
+                                                children: entry.field_credit_account.field_account_type.name
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        className: "flex items-center justify-between border-t border-slate-200 pt-3",
+                                        children: [
+                                            /*#__PURE__*/ _jsx("span", {
+                                                className: "text-xs font-semibold uppercase tracking-wide text-slate-500",
+                                                children: "Amount"
+                                            }),
+                                            /*#__PURE__*/ _jsx("div", {
+                                                className: "font-semibold text-slate-900",
+                                                children: /*#__PURE__*/ _jsx(Amount, {
+                                                    amt: entry.field_amount
+                                                })
+                                            })
+                                        ]
+                                    })
+                                ]
                             })
-                        }),
-                        /*#__PURE__*/ _jsx("div", {
-                            className: "w-28 border-b flex justify-center item-center",
-                            children: /*#__PURE__*/ _jsx("a", {
-                                className: "border",
-                                href: `/acc-journal-entry/?nodeId=${entry.drupal_internal__nid}`,
-                                children: "JRN"
-                            })
+                        ]
+                    }, entry.id))
+            }),
+            /*#__PURE__*/ _jsx("div", {
+                className: "sm:hidden md:flex",
+                children: /*#__PURE__*/ _jsx("div", {
+                    className: "overflow-x-auto border border-slate-200",
+                    children: /*#__PURE__*/ _jsxs("div", {
+                        className: "min-w-[800px]",
+                        children: [
+                            /*#__PURE__*/ _jsxs("div", {
+                                className: "grid grid-cols-[100px_140px_1.0fr_1.0fr_120px_80px] gap-1 border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-600",
+                                children: [
+                                    /*#__PURE__*/ _jsx("div", {
+                                        children: "Date"
+                                    }),
+                                    /*#__PURE__*/ _jsx("div", {
+                                        children: "Title"
+                                    }),
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        children: [
+                                            "Debit Ledger Name ",
+                                            /*#__PURE__*/ _jsx("br", {}),
+                                            /*#__PURE__*/ _jsx("span", {
+                                                className: "text-xs",
+                                                children: "Account Type"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        children: [
+                                            "Credit Ledger Name",
+                                            /*#__PURE__*/ _jsx("br", {}),
+                                            /*#__PURE__*/ _jsx("span", {
+                                                className: "text-xs",
+                                                children: "Account Type"
+                                            })
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ _jsx("div", {
+                                        children: "Amount"
+                                    }),
+                                    /*#__PURE__*/ _jsx("div", {
+                                        children: "Journal"
+                                    })
+                                ]
+                            }),
+                            data === null || data === void 0 ? void 0 : data.map((entry)=>/*#__PURE__*/ _jsxs("div", {
+                                    className: "grid grid-cols-[100px_140px_1.0fr_1.0fr_120px_80px] gap-1 border-b border-slate-200 px-4 py-4 text-sm text-slate-700 last:border-b-0",
+                                    children: [
+                                        /*#__PURE__*/ _jsx("div", {
+                                            children: entry.field_date
+                                        }),
+                                        /*#__PURE__*/ _jsx("div", {
+                                            children: entry.title
+                                        }),
+                                        /*#__PURE__*/ _jsxs("div", {
+                                            children: [
+                                                entry.field_debit_account.field_ledger_account_name,
+                                                /*#__PURE__*/ _jsx("br", {}),
+                                                /*#__PURE__*/ _jsx("span", {
+                                                    className: "text-xs",
+                                                    children: entry.field_debit_account.field_account_type.name
+                                                })
+                                            ]
+                                        }),
+                                        /*#__PURE__*/ _jsxs("div", {
+                                            children: [
+                                                entry.field_credit_account.field_ledger_account_name,
+                                                /*#__PURE__*/ _jsx("br", {}),
+                                                /*#__PURE__*/ _jsx("span", {
+                                                    className: "text-xs",
+                                                    children: entry.field_credit_account.field_account_type.name
+                                                })
+                                            ]
+                                        }),
+                                        /*#__PURE__*/ _jsx("div", {
+                                            children: /*#__PURE__*/ _jsx(Amount, {
+                                                amt: entry.field_amount
+                                            })
+                                        }),
+                                        /*#__PURE__*/ _jsx("div", {
+                                            className: "flex items-center justify-center",
+                                            children: /*#__PURE__*/ _jsx("a", {
+                                                className: "inline-flex rounded border border-slate-300 px-3 py-1 text-xs font-semibold uppercase tracking-wide hover:bg-slate-50",
+                                                href: `/acc-journal-entry/?nodeId=${entry.drupal_internal__nid}`,
+                                                children: "JRN"
+                                            })
+                                        })
+                                    ]
+                                }, entry.id))
+                        ]
+                    })
+                })
+            }),
+            /*#__PURE__*/ _jsxs("div", {
+                className: "flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between",
+                children: [
+                    /*#__PURE__*/ _jsx("div", {
+                        onClick: ()=>setPage((p)=>Math.max(p - 1, 0)),
+                        children: page !== 0 && /*#__PURE__*/ _jsx(Button, {
+                            children: "← Previous"
                         })
-                    ]
-                }, entry.id))
+                    }),
+                    /*#__PURE__*/ _jsxs("div", {
+                        className: "text-sm font-semibold text-slate-700",
+                        children: [
+                            "Page ",
+                            page + 1
+                        ]
+                    }),
+                    /*#__PURE__*/ _jsx("div", {
+                        onClick: ()=>setPage((p)=>p + 1),
+                        children: data && data.length !== 0 && /*#__PURE__*/ _jsx(Button, {
+                            children: "Next →"
+                        })
+                    })
+                ]
+            })
         ]
     });
 }

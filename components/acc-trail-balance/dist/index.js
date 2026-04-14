@@ -4,6 +4,8 @@ import useSWR from 'swr';
 import { JsonApiClient } from 'drupal-canvas';
 import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 import PageTitle from '@/components/utl-page-title';
+import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 /* --------------------------------------------------
    Drupal JSON:API Client
 -------------------------------------------------- */ const client = new JsonApiClient();
@@ -148,9 +150,11 @@ export default function TrialBalance() {
                         children: "Particular"
                     }),
                     /*#__PURE__*/ _jsx("div", {
+                        className: "w-full text-right",
                         children: "Dr Amount"
                     }),
                     /*#__PURE__*/ _jsx("div", {
+                        className: "w-full text-right",
                         children: "Cr Amount"
                     })
                 ]
@@ -162,10 +166,14 @@ export default function TrialBalance() {
                             children: ledger.field_ledger_account_name
                         }),
                         /*#__PURE__*/ _jsx("div", {
-                            children: getDebitTotalByLedger(ledger.id)
+                            children: /*#__PURE__*/ _jsx(Amount, {
+                                amt: getDebitTotalByLedger(ledger.id)
+                            })
                         }),
                         /*#__PURE__*/ _jsx("div", {
-                            children: getCreditTotalByLedger(ledger.id)
+                            children: /*#__PURE__*/ _jsx(Amount, {
+                                amt: getCreditTotalByLedger(ledger.id)
+                            })
                         })
                     ]
                 }, ledger.id)),
@@ -176,10 +184,14 @@ export default function TrialBalance() {
                         children: "Total"
                     }),
                     /*#__PURE__*/ _jsx("div", {
-                        children: sumOfDrAmount
+                        children: /*#__PURE__*/ _jsx(AmountTotal, {
+                            amt: sumOfDrAmount
+                        })
                     }),
                     /*#__PURE__*/ _jsx("div", {
-                        children: sumOfCrAmount
+                        children: /*#__PURE__*/ _jsx(AmountTotal, {
+                            amt: sumOfCrAmount
+                        })
                     })
                 ]
             })

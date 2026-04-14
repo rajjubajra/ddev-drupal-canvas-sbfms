@@ -4,6 +4,8 @@ import { JsonApiClient } from 'drupal-canvas';
 import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 
 import PageTitle from '@/components/utl-page-title';
+import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 
 /* --------------------------------------------------
    Drupal JSON:API Client
@@ -217,24 +219,24 @@ export default function TrialBalance() {
       {/* ---------------- Table Header ---------------- */}
       <div className="grid grid-cols-3 border-b mb-4 font-semibold text-sm">
         <div>Particular</div>
-        <div>Dr Amount</div>
-        <div>Cr Amount</div>
+        <div className='w-full text-right'>Dr Amount</div>
+        <div className='w-full text-right'>Cr Amount</div>
       </div>
 
       {/* ---------------- Ledger Rows ---------------- */}
       {ledgers?.map((ledger) => (
         <div key={ledger.id} className="grid grid-cols-3 text-sm">
           <div>{ledger.field_ledger_account_name}</div>
-          <div>{getDebitTotalByLedger(ledger.id)}</div>
-          <div>{getCreditTotalByLedger(ledger.id)}</div>
+          <div><Amount amt={getDebitTotalByLedger(ledger.id)} /></div>
+          <div><Amount amt={getCreditTotalByLedger(ledger.id)} /></div>
         </div>
       ))}
 
       {/* ---------------- Totals ---------------- */}
       <div className="grid grid-cols-3 border-t py-4 font-bold text-sm">
         <div>Total</div>
-        <div>{sumOfDrAmount}</div>
-        <div>{sumOfCrAmount}</div>
+        <div><AmountTotal amt={sumOfDrAmount} /></div>
+        <div><AmountTotal amt={sumOfCrAmount} /></div>
       </div>
     </div>
   );

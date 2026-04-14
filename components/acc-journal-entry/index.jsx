@@ -7,7 +7,7 @@ import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 
 import Button from '@/components/utl-button';
 import PageTitle from '@/components/utl-page-title';
-import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 
 /* --------------------------------------------------
    Drupal JSON:API Client
@@ -143,7 +143,7 @@ export default function JournalEntry() {
                   }
                   </a>
                 </div>
-                <Amount
+                <AmountTotal
                   amt={entry?.field_amount}
                 />
               </div>
@@ -161,7 +161,7 @@ export default function JournalEntry() {
                   }
                   </a>
                 </div>
-                <Amount
+                <AmountTotal
                   amt={entry?.field_amount}
                 />
               </div>

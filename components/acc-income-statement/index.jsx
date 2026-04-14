@@ -8,6 +8,7 @@ import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 import Button from '@/components/utl-button';
 import PageTitle from '@/components/utl-page-title';
 import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 
 /* --------------------------------------------------
    Drupal JSON:API Client
@@ -413,7 +414,7 @@ Date Filter Form
             <div>Less: Contra Revenue</div><div><Amount amt={contraRevenue} /></div>
           </div>     
           <div className='grid grid-cols-2'>
-            <div className='font-bold'>Net Revenue</div><div><Amount amt={netRevenue} /></div>
+            <div className='font-bold'>Net Revenue</div><div><AmountTotal amt={netRevenue} /></div>
           </div>
         </div>
 
@@ -446,7 +447,7 @@ Date Filter Form
 
         <div className='grid grid-cols-2'>
           <div className='uppercase font-bold'>Net profit</div>
-          <div><Amount amt={netProfit} /></div>
+          <div><AmountTotal amt={netProfit} /></div>
         </div>
       
     

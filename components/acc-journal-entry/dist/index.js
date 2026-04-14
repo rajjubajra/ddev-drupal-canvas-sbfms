@@ -5,7 +5,7 @@ import { JsonApiClient, FormattedText, Image } from 'drupal-canvas';
 import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 import Button from '@/components/utl-button';
 import PageTitle from '@/components/utl-page-title';
-import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 /* --------------------------------------------------
    Drupal JSON:API Client
 -------------------------------------------------- */ const client = new JsonApiClient();
@@ -143,7 +143,7 @@ export default function JournalEntry() {
                                                         children: entry === null || entry === void 0 ? void 0 : (_entry_field_debit_account1 = entry.field_debit_account) === null || _entry_field_debit_account1 === void 0 ? void 0 : _entry_field_debit_account1.field_ledger_account_name
                                                     })
                                                 }),
-                                                /*#__PURE__*/ _jsx(Amount, {
+                                                /*#__PURE__*/ _jsx(AmountTotal, {
                                                     amt: entry === null || entry === void 0 ? void 0 : entry.field_amount
                                                 })
                                             ]
@@ -165,7 +165,7 @@ export default function JournalEntry() {
                                                         children: entry === null || entry === void 0 ? void 0 : (_entry_field_credit_account1 = entry.field_credit_account) === null || _entry_field_credit_account1 === void 0 ? void 0 : _entry_field_credit_account1.field_ledger_account_name
                                                     })
                                                 }),
-                                                /*#__PURE__*/ _jsx(Amount, {
+                                                /*#__PURE__*/ _jsx(AmountTotal, {
                                                     amt: entry === null || entry === void 0 ? void 0 : entry.field_amount
                                                 })
                                             ]

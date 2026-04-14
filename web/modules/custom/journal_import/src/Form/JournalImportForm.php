@@ -2,12 +2,11 @@
 
 namespace Drupal\journal_import\Form;
 
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-
-
 
 class JournalImportForm extends FormBase {
 
@@ -15,28 +14,54 @@ class JournalImportForm extends FormBase {
     return 'journal_import_form';
   }
 
+  public function validateUpload(array &$form, FormStateInterface $form_state) {
+
+    $fid = $form_state->getValue('csv_file');
+
+    if (empty($fid)) {
+      $form_state->setErrorByName('csv_file', 'Please upload a CSV file.');
+      return;
+    }
+
+    $file = File::load($fid[0] ?? NULL);
+
+    if (!$file) {
+      $form_state->setErrorByName('csv_file', 'Invalid file uploaded.');
+      return;
+    }
+
+    $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+    if ($ext !== 'csv') {
+      $form_state->setErrorByName('csv_file', 'Only CSV files allowed.');
+    }
+  }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form['#cache']['max-age'] = 0;
 
-    // ✅ FIRST: Check if import just finished
+    // Ensure upload directory exists.
+    $directory = 'temporary://journal_import/';
+    \Drupal::service('file_system')->prepareDirectory(
+      $directory,
+      FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS
+    );
+
+    // Tempstore.
     $tempstore = \Drupal::service('tempstore.private')->get('journal_import');
 
+    // Clean up any file left behind by a finished or failed batch.
+    if (!$tempstore->get('csv_fid') && $tempstore->get('importing_csv_fid')) {
+      self::cleanupStoredFile('importing_csv_fid');
+    }
+
     if ($tempstore->get('import_done')) {
-
-    // 🔥 IMPORTANT: clear form_state cache
       $form_state->set('preview_rows', NULL);
-
-      // Clear temp data
-      $tempstore->delete('csv_fid');
       $tempstore->delete('import_done');
 
       $form['message'] = [
-        '#markup' => '<p>✅ Import completed successfully. Upload new file to continue.</p>',
+        '#markup' => '<p>Import finished. Upload a new file to continue.</p>',
       ];
-
-      return $form; // ⛔ STOP here (important)
     }
 
     $form['csv_file'] = [
@@ -46,88 +71,72 @@ class JournalImportForm extends FormBase {
       '#upload_validators' => [
         'file_validate_extensions' => ['csv'],
       ],
-      '#required' => TRUE,
     ];
 
     $form['upload'] = [
       '#type' => 'submit',
       '#value' => $this->t('Upload & Preview'),
+      '#validate' => ['::validateUpload'],
       '#submit' => ['::uploadFile'],
     ];
 
+    $fid = $tempstore->get('csv_fid');
 
-    $rows = $form_state->get('preview_rows');
+    if ($fid) {
+      $file = File::load($fid);
 
-    // Get file from tempstore
-    $fid = \Drupal::service('tempstore.private')
-      ->get('journal_import')
-      ->get('csv_fid');
+      if ($file) {
+        $filepath = \Drupal::service('file_system')->realpath($file->getFileUri());
 
-    if (!$fid) {
-      
-      $form_state->set('preview_rows', NULL); // 🔥 force clear
+        if ($form_state->get('preview_rows') === NULL) {
+          $rows = $this->processCsv($filepath);
+          $form_state->set('preview_rows', $rows);
+        }
 
-      $form['message'] = [
-        '#markup' => '<p>No file found. Please upload from Journal Import content.</p>',
-      ];
-      return $form;
-    }
+        $rows = $form_state->get('preview_rows');
 
-    $file = \Drupal\file\Entity\File::load($fid);
+        if (!empty($rows)) {
+          $header = array_keys($rows[0]);
 
-    if (!$file) {
-      $form['message'] = ['#markup' => '<p>Invalid file.</p>'];
-      return $form;
-    }
+          $form['preview'] = [
+            '#type' => 'table',
+            '#header' => $header,
+          ];
 
-    // ✅ Only allow CSV
-    $extension = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
-    if ($extension !== 'csv') {
-      $form['message'] = ['#markup' => '<p>Only CSV files are allowed.</p>'];
-      return $form;
-    }
+          foreach (array_slice($rows, 0, 20) as $i => $row) {
+            foreach ($row as $key => $value) {
+              $form['preview'][$i][$key] = [
+                '#markup' => ($value !== '' && is_scalar($value)) ? $value : '-',
+              ];
+            }
+          }
 
-    $filepath = \Drupal::service('file_system')->realpath($file->getFileUri());
+          $form['confirm'] = [
+            '#type' => 'submit',
+            '#value' => $this->t('Confirm Import'),
+            '#submit' => ['::confirmImport'],
+          ];
 
-    if ($fid && $form_state->get('preview_rows') === NULL) {
-      $rows = $this->processCsv($filepath);
-      $form_state->set('preview_rows', $rows);
-    }
-
-    // Preview
-    if (!empty($rows) && $fid) {
-
-      $header = array_keys($rows[0]);
-
-      $form['preview'] = [
-        '#type' => 'table',
-        '#header' => $header,
-      ];
-
-      foreach (array_slice($rows, 0, 20) as $i => $row) {
-        foreach ($row as $key => $value) {
-          $form['preview'][$i][$key] = [
-            '#markup' => (!empty($value) && is_scalar($value)) ? $value : '-',
+          $form['reset'] = [
+            '#type' => 'submit',
+            '#value' => 'Upload New File',
+            '#submit' => ['::resetForm'],
+          ];
+        }
+        else {
+          $form['message'] = [
+            '#markup' => '<p>No valid rows found in the CSV.</p>',
           ];
         }
       }
-
-      $form['confirm'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Confirm Import'),
-        '#submit' => ['::confirmImport'],
-      ];
+      else {
+        self::cleanupStoredFile('csv_fid');
+        $form['message'] = [
+          '#markup' => '<p>Invalid file.</p>',
+        ];
+      }
     }
 
-    if(!empty($rows)) {
-      $form['reset'] = [
-        '#type' => 'submit',
-        '#value' => 'Upload New File',
-        '#submit' => ['::resetForm'],
-      ];
-    }
-
-    
     return $form;
   }
 
@@ -139,6 +148,7 @@ class JournalImportForm extends FormBase {
     $rows = [];
     $errors = [];
     $row_number = 1;
+    $seen_titles = [];
 
     if (($handle = fopen($filepath, 'r')) !== FALSE) {
 
@@ -181,9 +191,15 @@ class JournalImportForm extends FormBase {
         }
 
         $data = array_combine($header, $row);
+        $data = array_map('trim', $data);
 
         if (!is_numeric($data['amount'])) {
           $errors[] = "Row $row_number skipped: amount must be numeric";
+          continue;
+        }
+
+        if (!$this->isValidCsvDate($data['date'])) {
+          $errors[] = "Row $row_number skipped: invalid date format (expected YYYY-MM-DD)";
           continue;
         }
 
@@ -192,6 +208,13 @@ class JournalImportForm extends FormBase {
           continue;
         }
 
+        $normalized_title = self::normalizeTitle($data['title']);
+        if (isset($seen_titles[$normalized_title])) {
+          $errors[] = "Row $row_number skipped: duplicate title in CSV";
+          continue;
+        }
+
+        $seen_titles[$normalized_title] = TRUE;
         $rows[] = $data;
       }
 
@@ -211,6 +234,8 @@ class JournalImportForm extends FormBase {
   public function confirmImport(array &$form, FormStateInterface $form_state) {
 
     $rows = $form_state->get('preview_rows');
+    $tempstore = \Drupal::service('tempstore.private')->get('journal_import');
+    $fid = $tempstore->get('csv_fid');
 
     if (empty($rows)) {
       \Drupal::messenger()->addError('Nothing to import.');
@@ -234,20 +259,22 @@ class JournalImportForm extends FormBase {
     if (!empty($existing)) {
       $nodes = Node::loadMultiple($existing);
       foreach ($nodes as $node) {
-        $existing_titles[] = $node->getTitle();
+        $existing_titles[] = self::normalizeTitle($node->getTitle());
       }
     }
 
-    // 🔥 Remove CSV reference BEFORE batch starts
-    \Drupal::service('tempstore.private')
-      ->get('journal_import')
-      ->delete('csv_fid');
+    if ($fid) {
+      $was_uploaded_via_form = (bool) $tempstore->get('csv_fid_owned');
+      $tempstore->set('importing_csv_fid', $fid);
+      if ($was_uploaded_via_form) {
+        $tempstore->set('importing_csv_fid_owned', TRUE);
+      }
+      $tempstore->delete('csv_fid');
+      $tempstore->delete('csv_fid_owned');
+    }
 
-    // Clear preview
     $form_state->set('preview_rows', NULL);
 
-
-    // Batch setup
     $batch = [
       'title' => 'Importing CSV...',
       'operations' => [],
@@ -274,10 +301,10 @@ class JournalImportForm extends FormBase {
    */
   public static function processRow($row, $existing_titles, &$context) {
 
-    $title = $row['title'];
+    $title = trim($row['title']);
+    $normalized_title = self::normalizeTitle($title);
 
-    // 🚫 Skip duplicate
-    if (in_array($title, $existing_titles)) {
+    if (in_array($normalized_title, $existing_titles, TRUE)) {
       $context['results']['skipped'][] = $title;
       return;
     }
@@ -290,12 +317,12 @@ class JournalImportForm extends FormBase {
       $node = Node::create([
         'type'  => 'acc_journal_entry',
         'title' => $title,
-        'field_amount' => $row['amount'],
+        'field_amount' => floatval($row['amount']),
         'field_date'   => $row['date'],
         'field_debit_account'  => $debit_id,
         'field_credit_account' => $credit_id,
-        'field_description' => $row['description'] ?? '',
-        'field_comment' => $row['comment'] ?? '',
+        'field_description' => trim($row['description'] ?? ''),
+        'field_comment' => trim($row['comment'] ?? ''),
         'status' => 1,
       ]);
 
@@ -304,35 +331,36 @@ class JournalImportForm extends FormBase {
       $context['results']['imported'][] = $title;
 
     } catch (\Exception $e) {
+      \Drupal::logger('journal_import')->error('Error importing row: @error', ['@error' => $e->getMessage()]);
       $context['results']['errors'][] = $title;
     }
   }
 
-
   public function uploadFile(array &$form, FormStateInterface $form_state) {
 
-  $fid = $form_state->getValue('csv_file')[0] ?? NULL;
+    $fid = $form_state->getValue('csv_file')[0] ?? NULL;
+    $tempstore = \Drupal::service('tempstore.private')->get('journal_import');
 
-  if (!$fid) {
-    \Drupal::messenger()->addError('Please upload a CSV file.');
-    return;
-  }
+    if (!$fid) {
+      \Drupal::messenger()->addError('No file uploaded.');
+      return;
+    }
 
-  $file = \Drupal\file\Entity\File::load($fid);
+    $file = File::load($fid);
 
-  if ($file) {
-    // Mark permanent (optional but safer)
-    $file->setPermanent();
-    $file->save();
+    if ($file) {
+      $previous_fid = $tempstore->get('csv_fid');
+      if ($previous_fid && (int) $previous_fid !== (int) $fid) {
+        self::cleanupStoredFile('csv_fid');
+      }
 
-    // Save to tempstore
-    \Drupal::service('tempstore.private')
-      ->get('journal_import')
-      ->set('csv_fid', $fid);
+      self::cleanupStoredFile('importing_csv_fid');
+      $tempstore->delete('import_done');
+      $tempstore->set('csv_fid', $fid);
+      $tempstore->set('csv_fid_owned', TRUE);
 
-    // Rebuild form to show preview
-    $form_state->setRebuild(TRUE);
-  }
+      $form_state->setRebuild(TRUE);
+    }
   }
 
   /**
@@ -343,27 +371,26 @@ class JournalImportForm extends FormBase {
     if ($success) {
       $count = count($results['imported'] ?? []);
       $skipped = count($results['skipped'] ?? []);
+      $errors = count($results['errors'] ?? []);
 
       \Drupal::messenger()->addStatus("Imported: $count");
-      \Drupal::messenger()->addWarning("Skipped duplicates: $skipped");
+      if ($skipped > 0) {
+        \Drupal::messenger()->addWarning("Skipped duplicates: $skipped");
+      }
+      if ($errors > 0) {
+        \Drupal::messenger()->addWarning("Rows with errors: $errors");
+      }
 
       $tempstore = \Drupal::service('tempstore.private')->get('journal_import');
 
-      // ✅ Mark import complete
+      self::cleanupStoredFile('importing_csv_fid');
       $tempstore->set('import_done', TRUE);
-
-       // 🔥 THIS IS CRITICAL
-      $response = new \Symfony\Component\HttpFoundation\RedirectResponse(
-        \Drupal\Core\Url::fromRoute('journal_import.form')->toString()
-      );
-      $response->send();
-      exit;
 
     }
     else {
+      self::cleanupStoredFile('importing_csv_fid');
       \Drupal::messenger()->addError('Import failed.');
     }
-
   }
 
   /**
@@ -371,7 +398,7 @@ class JournalImportForm extends FormBase {
    */
   private static function getOrCreateLedgerStatic($title) {
 
-    if (empty($title)) {
+    if (empty(trim($title))) {
       return NULL;
     }
 
@@ -379,7 +406,7 @@ class JournalImportForm extends FormBase {
 
     $existing = $storage->loadByProperties([
       'type' => 'accounting_ledger',
-      'title' => $title,
+      'title' => trim($title),
     ]);
 
     if ($ledger = reset($existing)) {
@@ -388,7 +415,7 @@ class JournalImportForm extends FormBase {
 
     $ledger = $storage->create([
       'type' => 'accounting_ledger',
-      'title' => $title,
+      'title' => trim($title),
       'status' => 1,
     ]);
 
@@ -397,21 +424,46 @@ class JournalImportForm extends FormBase {
     return $ledger->id();
   }
 
+  private function isValidCsvDate($date) {
+
+    $parsed_date = \DateTime::createFromFormat('!Y-m-d', $date);
+    $errors = \DateTime::getLastErrors();
+
+    return $parsed_date
+      && $parsed_date->format('Y-m-d') === $date
+      && (($errors['warning_count'] ?? 0) === 0)
+      && (($errors['error_count'] ?? 0) === 0);
+  }
+
+  private static function normalizeTitle($title) {
+    return strtolower(trim((string) $title));
+  }
+
+  private static function cleanupStoredFile($tempstore_key) {
+
+    $tempstore = \Drupal::service('tempstore.private')->get('journal_import');
+    $fid = $tempstore->get($tempstore_key);
+    $owned_key = $tempstore_key . '_owned';
+    $delete_file = (bool) $tempstore->get($owned_key);
+
+    if ($fid) {
+      if ($delete_file && ($file = File::load($fid))) {
+        $file->delete();
+      }
+
+      $tempstore->delete($tempstore_key);
+    }
+
+    $tempstore->delete($owned_key);
+  }
+
   public function resetForm(array &$form, FormStateInterface $form_state) {
 
-    // Clear tempstore
-    \Drupal::service('tempstore.private')
-      ->get('journal_import')
-      ->delete('csv_fid');
-
-    \Drupal::service('tempstore.private')
-      ->get('journal_import')
-      ->delete('import_done');
-
-    // Clear preview data
+    self::cleanupStoredFile('csv_fid');
+    self::cleanupStoredFile('importing_csv_fid');
+    \Drupal::service('tempstore.private')->get('journal_import')->delete('import_done');
     $form_state->set('preview_rows', NULL);
 
-    // Redirect to same form (clean state)
     $form_state->setRedirect('journal_import.form');
   }
 

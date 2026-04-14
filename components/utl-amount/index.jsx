@@ -10,8 +10,8 @@
 
 const Amount = ({amt}) => {
   return (
-    <div className="text-sm text-blue-600">
-      <span>NPR</span><span className="font-bold text-right"> {Number(amt).toFixed(2)}</span>
+    <div className="text-sm w-full text-right">
+      <span> {Number(amt).toFixed(2)}</span>
     </div>
   );
 };

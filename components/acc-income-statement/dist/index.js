@@ -6,6 +6,7 @@ import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 import Button from '@/components/utl-button';
 import PageTitle from '@/components/utl-page-title';
 import Amount from '@/components/utl-amount';
+import AmountTotal from '@/components/utl-amount-total';
 /* --------------------------------------------------
    Drupal JSON:API Client
 -------------------------------------------------- */ const client = new JsonApiClient();
@@ -383,7 +384,7 @@ export default function JournalEntriesList() {
                                         children: "Net Revenue"
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
-                                        children: /*#__PURE__*/ _jsx(Amount, {
+                                        children: /*#__PURE__*/ _jsx(AmountTotal, {
                                             amt: netRevenue
                                         })
                                     })
@@ -466,7 +467,7 @@ export default function JournalEntriesList() {
                                 children: "Net profit"
                             }),
                             /*#__PURE__*/ _jsx("div", {
-                                children: /*#__PURE__*/ _jsx(Amount, {
+                                children: /*#__PURE__*/ _jsx(AmountTotal, {
                                     amt: netProfit
                                 })
                             })
