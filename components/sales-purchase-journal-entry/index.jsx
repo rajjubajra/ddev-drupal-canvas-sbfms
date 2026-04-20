@@ -19,6 +19,8 @@ export default function PurchaseJournalEntry() {
   * Then display the purchase details and provide a button to post a journal entry for the purchase.
   -------------------------------------------------------------------------------------------*/
   const [uuid, setUuid] = useState(null);
+  const [journalEntryNodeId, setJournalEntryNodeId] = useState(null);
+  const [isCheckingJournal, setIsCheckingJournal] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -64,6 +66,27 @@ export default function PurchaseJournalEntry() {
   console.log('SWR Include:', data?.included);
   console.log('SWR Error:', error);
   console.log('SWR Loading:', isLoading);
+
+  // Check if journal entry already exists for this purchase
+  useEffect(() => {
+    const purchaseNid = data?.data?.attributes?.drupal_internal__nid;
+    if (!purchaseNid) return;
+
+    setIsCheckingJournal(true);
+    
+    fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${purchaseNid}`)
+      .then(res => res.json())
+      .then(result => {
+        if (result?.data?.length > 0) {
+          setJournalEntryNodeId(result.data[0].attributes.drupal_internal__nid);
+        }
+        setIsCheckingJournal(false);
+      })
+      .catch(err => {
+        console.error('Error checking journal entry:', err);
+        setIsCheckingJournal(false);
+      });
+  }, [data?.data?.attributes?.drupal_internal__nid]);
 
 
 
@@ -267,12 +290,25 @@ export default function PurchaseJournalEntry() {
 
               {/* Journal Entry Post Button */}
               <div className='py-2'>
-                <button
-                  className='cursor-pointer px-4 py-2 border bg-slate-600 text-white'
-                  onClick={() => postJournalForPurchase(data?.data?.attributes)}
-                >
-                  Post Journal Entry
-                </button>
+                {isCheckingJournal ? (
+                  <button className='cursor-wait px-4 py-2 border bg-slate-400 text-white' disabled>
+                    Checking...
+                  </button>
+                ) : journalEntryNodeId ? (
+                  <button
+                    className='cursor-pointer px-4 py-2 border bg-blue-600 text-white'
+                    onClick={() => window.location.href = `/acc-journal-entry?nodeId=${journalEntryNodeId}`}
+                  >
+                    Go to Journal Entry
+                  </button>
+                ) : (
+                  <button
+                    className='cursor-pointer px-4 py-2 border bg-slate-600 text-white'
+                    onClick={() => postJournalForPurchase(data?.data?.attributes)}
+                  >
+                    Post Journal Entry
+                  </button>
+                )}
               </div>
               
 

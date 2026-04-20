@@ -36,11 +36,13 @@ import PageTitle from '@/components/utl-page-title';
 import Amount from '@/components/utl-amount';
 const client = new JsonApiClient();
 export default function PurchaseJournalEntry() {
-    var _data_data, _data_data_attributes, _data_data1, _data_data_attributes1, _data_data2, _data_included, _data_included1, _data_data_attributes2, _data_data3, _data_data_attributes3, _data_data4, _data_data_attributes4, _data_data5, _data_data_attributes5, _data_data6, _data_data_attributes6, _data_data7, _data_data_attributes7, _data_data8, _data_data_attributes8, _data_data9, _data_data_attributes9, _data_data10, _data_data_attributes10, _data_data11, _data_data_attributes11, _data_data12, _data_data_attributes12, _data_data13, _data_included2, _data_included3;
+    var _data_data, _data_data_attributes, _data_data1, _data_data_attributes1, _data_data2, _data_data_attributes2, _data_data3, _data_included, _data_included1, _data_data_attributes3, _data_data4, _data_data_attributes4, _data_data5, _data_data_attributes5, _data_data6, _data_data_attributes6, _data_data7, _data_data_attributes7, _data_data8, _data_data_attributes8, _data_data9, _data_data_attributes9, _data_data10, _data_data_attributes10, _data_data11, _data_data_attributes11, _data_data12, _data_data_attributes12, _data_data13, _data_data_attributes13, _data_data14, _data_included2, _data_included3;
     /**--------------------------------------------------------------------------------------------
   * Extract UUID from URL query parameters and fetch the corresponding purchase data via JSON:API.
   * Then display the purchase details and provide a button to post a journal entry for the purchase.
   -------------------------------------------------------------------------------------------*/ const [uuid, setUuid] = useState(null);
+    const [journalEntryNodeId, setJournalEntryNodeId] = useState(null);
+    const [isCheckingJournal, setIsCheckingJournal] = useState(false);
     useEffect(()=>{
         const params = new URLSearchParams(window.location.search);
         const uuidParam = params.get('uuid');
@@ -74,6 +76,25 @@ export default function PurchaseJournalEntry() {
     console.log('SWR Include:', data === null || data === void 0 ? void 0 : data.included);
     console.log('SWR Error:', error);
     console.log('SWR Loading:', isLoading);
+    // Check if journal entry already exists for this purchase
+    useEffect(()=>{
+        var _data_data_attributes, _data_data;
+        const purchaseNid = data === null || data === void 0 ? void 0 : (_data_data = data.data) === null || _data_data === void 0 ? void 0 : (_data_data_attributes = _data_data.attributes) === null || _data_data_attributes === void 0 ? void 0 : _data_data_attributes.drupal_internal__nid;
+        if (!purchaseNid) return;
+        setIsCheckingJournal(true);
+        fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${purchaseNid}`).then((res)=>res.json()).then((result)=>{
+            var _result_data;
+            if ((result === null || result === void 0 ? void 0 : (_result_data = result.data) === null || _result_data === void 0 ? void 0 : _result_data.length) > 0) {
+                setJournalEntryNodeId(result.data[0].attributes.drupal_internal__nid);
+            }
+            setIsCheckingJournal(false);
+        }).catch((err)=>{
+            console.error('Error checking journal entry:', err);
+            setIsCheckingJournal(false);
+        });
+    }, [
+        data === null || data === void 0 ? void 0 : (_data_data1 = data.data) === null || _data_data1 === void 0 ? void 0 : (_data_data_attributes = _data_data1.attributes) === null || _data_data_attributes === void 0 ? void 0 : _data_data_attributes.drupal_internal__nid
+    ]);
     // Get CSRF token
     function getCsrfToken() {
         return _async_to_generator(function*() {
@@ -187,13 +208,13 @@ export default function PurchaseJournalEntry() {
                         /*#__PURE__*/ _jsxs("div", {
                             children: [
                                 "Invoice date: ",
-                                data === null || data === void 0 ? void 0 : (_data_data1 = data.data) === null || _data_data1 === void 0 ? void 0 : (_data_data_attributes = _data_data1.attributes) === null || _data_data_attributes === void 0 ? void 0 : _data_data_attributes.field_invoice_date
+                                data === null || data === void 0 ? void 0 : (_data_data2 = data.data) === null || _data_data2 === void 0 ? void 0 : (_data_data_attributes1 = _data_data2.attributes) === null || _data_data_attributes1 === void 0 ? void 0 : _data_data_attributes1.field_invoice_date
                             ]
                         }),
                         /*#__PURE__*/ _jsxs("div", {
                             children: [
                                 "Purchase date: ",
-                                data === null || data === void 0 ? void 0 : (_data_data2 = data.data) === null || _data_data2 === void 0 ? void 0 : (_data_data_attributes1 = _data_data2.attributes) === null || _data_data_attributes1 === void 0 ? void 0 : _data_data_attributes1.field_received_date
+                                data === null || data === void 0 ? void 0 : (_data_data3 = data.data) === null || _data_data3 === void 0 ? void 0 : (_data_data_attributes2 = _data_data3.attributes) === null || _data_data_attributes2 === void 0 ? void 0 : _data_data_attributes2.field_received_date
                             ]
                         }),
                         /*#__PURE__*/ _jsx("div", {
@@ -267,13 +288,13 @@ export default function PurchaseJournalEntry() {
                                                 /*#__PURE__*/ _jsxs("div", {
                                                     className: "text-center",
                                                     children: [
-                                                        data === null || data === void 0 ? void 0 : (_data_data3 = data.data) === null || _data_data3 === void 0 ? void 0 : (_data_data_attributes2 = _data_data3.attributes) === null || _data_data_attributes2 === void 0 ? void 0 : _data_data_attributes2.field_quantity,
+                                                        data === null || data === void 0 ? void 0 : (_data_data4 = data.data) === null || _data_data4 === void 0 ? void 0 : (_data_data_attributes3 = _data_data4.attributes) === null || _data_data_attributes3 === void 0 ? void 0 : _data_data_attributes3.field_quantity,
                                                         /*#__PURE__*/ _jsx("br", {}),
                                                         /*#__PURE__*/ _jsxs("span", {
                                                             className: "text-xs",
                                                             children: [
                                                                 "[ in units: ",
-                                                                (data === null || data === void 0 ? void 0 : (_data_data4 = data.data) === null || _data_data4 === void 0 ? void 0 : (_data_data_attributes3 = _data_data4.attributes) === null || _data_data_attributes3 === void 0 ? void 0 : _data_data_attributes3.field_quantity) * (data === null || data === void 0 ? void 0 : (_data_data5 = data.data) === null || _data_data5 === void 0 ? void 0 : (_data_data_attributes4 = _data_data5.attributes) === null || _data_data_attributes4 === void 0 ? void 0 : _data_data_attributes4.field_unit_per_box),
+                                                                (data === null || data === void 0 ? void 0 : (_data_data5 = data.data) === null || _data_data5 === void 0 ? void 0 : (_data_data_attributes4 = _data_data5.attributes) === null || _data_data_attributes4 === void 0 ? void 0 : _data_data_attributes4.field_quantity) * (data === null || data === void 0 ? void 0 : (_data_data6 = data.data) === null || _data_data6 === void 0 ? void 0 : (_data_data_attributes5 = _data_data6.attributes) === null || _data_data_attributes5 === void 0 ? void 0 : _data_data_attributes5.field_unit_per_box),
                                                                 "]"
                                                             ]
                                                         })
@@ -282,25 +303,25 @@ export default function PurchaseJournalEntry() {
                                                 /*#__PURE__*/ _jsx("div", {
                                                     className: "text-center",
                                                     children: /*#__PURE__*/ _jsx(Amount, {
-                                                        amt: (data === null || data === void 0 ? void 0 : (_data_data6 = data.data) === null || _data_data6 === void 0 ? void 0 : (_data_data_attributes5 = _data_data6.attributes) === null || _data_data_attributes5 === void 0 ? void 0 : _data_data_attributes5.field_cost_price) / (data === null || data === void 0 ? void 0 : (_data_data7 = data.data) === null || _data_data7 === void 0 ? void 0 : (_data_data_attributes6 = _data_data7.attributes) === null || _data_data_attributes6 === void 0 ? void 0 : _data_data_attributes6.field_unit_per_box)
+                                                        amt: (data === null || data === void 0 ? void 0 : (_data_data7 = data.data) === null || _data_data7 === void 0 ? void 0 : (_data_data_attributes6 = _data_data7.attributes) === null || _data_data_attributes6 === void 0 ? void 0 : _data_data_attributes6.field_cost_price) / (data === null || data === void 0 ? void 0 : (_data_data8 = data.data) === null || _data_data8 === void 0 ? void 0 : (_data_data_attributes7 = _data_data8.attributes) === null || _data_data_attributes7 === void 0 ? void 0 : _data_data_attributes7.field_unit_per_box)
                                                     })
                                                 }),
                                                 /*#__PURE__*/ _jsx("div", {
                                                     className: "text-center",
                                                     children: /*#__PURE__*/ _jsx(Amount, {
-                                                        amt: data === null || data === void 0 ? void 0 : (_data_data8 = data.data) === null || _data_data8 === void 0 ? void 0 : (_data_data_attributes7 = _data_data8.attributes) === null || _data_data_attributes7 === void 0 ? void 0 : _data_data_attributes7.field_cost_price
+                                                        amt: data === null || data === void 0 ? void 0 : (_data_data9 = data.data) === null || _data_data9 === void 0 ? void 0 : (_data_data_attributes8 = _data_data9.attributes) === null || _data_data_attributes8 === void 0 ? void 0 : _data_data_attributes8.field_cost_price
                                                     })
                                                 }),
                                                 /*#__PURE__*/ _jsx("div", {
                                                     className: "text-center",
                                                     children: /*#__PURE__*/ _jsx(Amount, {
-                                                        amt: (data === null || data === void 0 ? void 0 : (_data_data9 = data.data) === null || _data_data9 === void 0 ? void 0 : (_data_data_attributes8 = _data_data9.attributes) === null || _data_data_attributes8 === void 0 ? void 0 : _data_data_attributes8.field_quantity) * (data === null || data === void 0 ? void 0 : (_data_data10 = data.data) === null || _data_data10 === void 0 ? void 0 : (_data_data_attributes9 = _data_data10.attributes) === null || _data_data_attributes9 === void 0 ? void 0 : _data_data_attributes9.field_cost_price)
+                                                        amt: (data === null || data === void 0 ? void 0 : (_data_data10 = data.data) === null || _data_data10 === void 0 ? void 0 : (_data_data_attributes9 = _data_data10.attributes) === null || _data_data_attributes9 === void 0 ? void 0 : _data_data_attributes9.field_quantity) * (data === null || data === void 0 ? void 0 : (_data_data11 = data.data) === null || _data_data11 === void 0 ? void 0 : (_data_data_attributes10 = _data_data11.attributes) === null || _data_data_attributes10 === void 0 ? void 0 : _data_data_attributes10.field_cost_price)
                                                     })
                                                 }),
                                                 /*#__PURE__*/ _jsx("div", {
                                                     className: "text-center",
                                                     children: /*#__PURE__*/ _jsx(Amount, {
-                                                        amt: (data === null || data === void 0 ? void 0 : (_data_data11 = data.data) === null || _data_data11 === void 0 ? void 0 : (_data_data_attributes10 = _data_data11.attributes) === null || _data_data_attributes10 === void 0 ? void 0 : _data_data_attributes10.field_quantity) * (data === null || data === void 0 ? void 0 : (_data_data12 = data.data) === null || _data_data12 === void 0 ? void 0 : (_data_data_attributes11 = _data_data12.attributes) === null || _data_data_attributes11 === void 0 ? void 0 : _data_data_attributes11.field_selling_price)
+                                                        amt: (data === null || data === void 0 ? void 0 : (_data_data12 = data.data) === null || _data_data12 === void 0 ? void 0 : (_data_data_attributes11 = _data_data12.attributes) === null || _data_data_attributes11 === void 0 ? void 0 : _data_data_attributes11.field_quantity) * (data === null || data === void 0 ? void 0 : (_data_data13 = data.data) === null || _data_data13 === void 0 ? void 0 : (_data_data_attributes12 = _data_data13.attributes) === null || _data_data_attributes12 === void 0 ? void 0 : _data_data_attributes12.field_selling_price)
                                                     })
                                                 })
                                             ]
@@ -315,7 +336,7 @@ export default function PurchaseJournalEntry() {
                                 className: "uppercase text-sm font-bold",
                                 children: [
                                     "Units Per Box/Case: ",
-                                    data === null || data === void 0 ? void 0 : (_data_data13 = data.data) === null || _data_data13 === void 0 ? void 0 : (_data_data_attributes12 = _data_data13.attributes) === null || _data_data_attributes12 === void 0 ? void 0 : _data_data_attributes12.field_unit_per_box
+                                    data === null || data === void 0 ? void 0 : (_data_data14 = data.data) === null || _data_data14 === void 0 ? void 0 : (_data_data_attributes13 = _data_data14.attributes) === null || _data_data_attributes13 === void 0 ? void 0 : _data_data_attributes13.field_unit_per_box
                                 ]
                             })
                         }),
@@ -367,7 +388,15 @@ export default function PurchaseJournalEntry() {
                         })),
                         /*#__PURE__*/ _jsx("div", {
                             className: "py-2",
-                            children: /*#__PURE__*/ _jsx("button", {
+                            children: isCheckingJournal ? /*#__PURE__*/ _jsx("button", {
+                                className: "cursor-wait px-4 py-2 border bg-slate-400 text-white",
+                                disabled: true,
+                                children: "Checking..."
+                            }) : journalEntryNodeId ? /*#__PURE__*/ _jsx("button", {
+                                className: "cursor-pointer px-4 py-2 border bg-blue-600 text-white",
+                                onClick: ()=>window.location.href = `/acc-journal-entry?nodeId=${journalEntryNodeId}`,
+                                children: "Go to Journal Entry"
+                            }) : /*#__PURE__*/ _jsx("button", {
                                 className: "cursor-pointer px-4 py-2 border bg-slate-600 text-white",
                                 onClick: ()=>{
                                     var _data_data;
