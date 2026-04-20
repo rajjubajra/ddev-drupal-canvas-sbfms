@@ -359,7 +359,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
                 <div className='w-full'>
                   <a className={`p-2 border border-slate-400 cursor-pointer text-xs w-full
                   ${isPosted ? 'bg-slate-100' : 'bg-slate-400 text-blue-500'}`}                   
-                  href={`/sales-purchase-item/?nodeId=${item.drupal_internal__nid}`}>
+                  href={`/purchase-post-journal/?uuid=${item.id}`}>
                      {isPosted ? 'View Details' : 'Post Journal Entry'} - {item.drupal_internal__nid}
                   </a>
                  
