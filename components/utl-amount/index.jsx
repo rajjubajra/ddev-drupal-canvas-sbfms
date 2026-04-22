@@ -9,11 +9,7 @@
  */
 
 const Amount = ({amt}) => {
-  return (
-    <div className="text-sm w-full text-right">
-      <span> {Number(amt).toFixed(2)}</span>
-    </div>
-  );
+  return (<span> {Number(amt).toFixed(2)}</span>);
 };
 
 export default Amount;

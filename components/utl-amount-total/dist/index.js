@@ -1,4 +1,4 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsxs as _jsxs } from "react/jsx-runtime";
 /**
  * 
  * IMPORTANT NOTE: 
@@ -7,15 +7,12 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  *  - Currency Name
  *   
  */ const AmountTotal = ({ amt })=>{
-    return /*#__PURE__*/ _jsx("div", {
-        className: "text-sm text-blue-600 w-full text-right",
-        children: /*#__PURE__*/ _jsxs("span", {
-            className: "font-bold",
-            children: [
-                " ",
-                Number(amt).toFixed(2)
-            ]
-        })
+    return /*#__PURE__*/ _jsxs("span", {
+        className: "font-bold text-blue-600",
+        children: [
+            " ",
+            Number(amt).toFixed(2)
+        ]
     });
 };
 export default AmountTotal;

@@ -48,10 +48,6 @@ export default function JournalEntry() {
      Render UI
   -------------------------------------------------- */ return /*#__PURE__*/ _jsxs("div", {
         children: [
-            /*#__PURE__*/ _jsx(PageTitle, {
-                title: "Journal Entries"
-            }),
-            /*#__PURE__*/ _jsx("div", {}),
             /*#__PURE__*/ _jsxs("div", {
                 className: "w-full flex justify-end mb-4 gap-2",
                 children: [
@@ -69,104 +65,125 @@ export default function JournalEntry() {
                     })
                 ]
             }),
+            /*#__PURE__*/ _jsx(PageTitle, {
+                title: "Journal Entries"
+            }),
+            /*#__PURE__*/ _jsx("div", {}),
             data === null || data === void 0 ? void 0 : data.map((entry)=>{
                 var _entry_field_description, _entry_field_comment, _entry_field_debit_account, _entry_field_debit_account1, _entry_field_credit_account, _entry_field_credit_account1, _entry_field_image_image;
                 return /*#__PURE__*/ _jsxs("div", {
-                    className: "my-2 py-4 border-b-2 border-slate-500",
+                    className: "my-2 py-4 border border-slate-300",
                     children: [
                         /*#__PURE__*/ _jsxs("div", {
-                            className: "flex justify-between",
+                            className: "border-b border-slate-300 flex flex-wrap justify-between",
                             children: [
                                 /*#__PURE__*/ _jsxs("div", {
+                                    className: "px-4",
                                     children: [
-                                        "Date: ",
-                                        entry === null || entry === void 0 ? void 0 : entry.field_date
+                                        /*#__PURE__*/ _jsx("div", {
+                                            className: "font-semibold",
+                                            children: entry === null || entry === void 0 ? void 0 : entry.title
+                                        }),
+                                        /*#__PURE__*/ _jsx("div", {
+                                            className: "text-xs",
+                                            children: entry === null || entry === void 0 ? void 0 : entry.field_date
+                                        })
                                     ]
                                 }),
                                 /*#__PURE__*/ _jsx("div", {
-                                    className: "flex gap-2",
-                                    children: /*#__PURE__*/ _jsx("a", {
-                                        href: `/node/${entry === null || entry === void 0 ? void 0 : entry.drupal_internal__nid}/edit?destination=/admin/content`,
-                                        children: /*#__PURE__*/ _jsx(Button, {
-                                            children: "Edit"
+                                    className: "px-4",
+                                    children: /*#__PURE__*/ _jsx("div", {
+                                        className: "flex gap-2",
+                                        children: /*#__PURE__*/ _jsx("a", {
+                                            href: `/node/${entry === null || entry === void 0 ? void 0 : entry.drupal_internal__nid}/edit?destination=/admin/content`,
+                                            children: /*#__PURE__*/ _jsx(Button, {
+                                                children: "Edit"
+                                            })
                                         })
                                     })
                                 })
                             ]
                         }),
                         /*#__PURE__*/ _jsxs("div", {
-                            className: "my-2 mx-4 border-l border-slate-400 pl-4",
+                            className: "my-2 pl-4 flex flex-wrap",
                             children: [
                                 /*#__PURE__*/ _jsx("div", {
-                                    className: "mt-2 text-xs font-bold uppercase",
+                                    className: "mt-2 text-xs uppercase w-32",
                                     children: "Description"
                                 }),
-                                /*#__PURE__*/ _jsx(FormattedText, {
-                                    children: entry === null || entry === void 0 ? void 0 : (_entry_field_description = entry.field_description) === null || _entry_field_description === void 0 ? void 0 : _entry_field_description.processed
+                                /*#__PURE__*/ _jsx("div", {
+                                    className: "mt-1 ml-2 text-sm",
+                                    children: /*#__PURE__*/ _jsx(FormattedText, {
+                                        children: entry === null || entry === void 0 ? void 0 : (_entry_field_description = entry.field_description) === null || _entry_field_description === void 0 ? void 0 : _entry_field_description.processed
+                                    })
                                 })
                             ]
                         }),
                         /*#__PURE__*/ _jsxs("div", {
-                            className: "my-2 mx-4 border-l border-slate-400 pl-4",
+                            className: "my-2 pl-4 flex flex-wrap",
                             children: [
                                 /*#__PURE__*/ _jsx("div", {
-                                    className: "mt-2 text-xs font-bold uppercase",
+                                    className: "mt-2 text-xs uppercase w-32",
                                     children: "Comment"
                                 }),
-                                /*#__PURE__*/ _jsx(FormattedText, {
-                                    children: entry === null || entry === void 0 ? void 0 : (_entry_field_comment = entry.field_comment) === null || _entry_field_comment === void 0 ? void 0 : _entry_field_comment.processed
+                                /*#__PURE__*/ _jsx("div", {
+                                    className: "mt-1 ml-2 text-sm",
+                                    children: /*#__PURE__*/ _jsx(FormattedText, {
+                                        children: entry === null || entry === void 0 ? void 0 : (_entry_field_comment = entry.field_comment) === null || _entry_field_comment === void 0 ? void 0 : _entry_field_comment.processed
+                                    })
                                 })
                             ]
                         }),
                         /*#__PURE__*/ _jsxs("div", {
-                            className: "text-xs",
-                            children: [
-                                "Jouran Post title: ",
-                                entry === null || entry === void 0 ? void 0 : entry.title
-                            ]
-                        }),
-                        /*#__PURE__*/ _jsxs("div", {
-                            className: "flex flex-wrap md:justify-between my-4",
+                            className: "grid md:grid-cols-2 md:justify-between my-4 border-t border-b border-slate-300",
                             children: [
                                 /*#__PURE__*/ _jsxs("div", {
+                                    className: "border-r border-slate-300 p-4",
                                     children: [
                                         /*#__PURE__*/ _jsx("div", {
                                             className: "font-semibold",
                                             children: "Debit"
                                         }),
                                         /*#__PURE__*/ _jsxs("div", {
-                                            className: "mx-4 pl-4 border-l border-slate-400",
+                                            className: "mx-4 pl-4 border-l-2 border-blue-400",
                                             children: [
                                                 /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-sm tracking-tighter",
                                                     children: /*#__PURE__*/ _jsx("a", {
                                                         href: `/acc-ledger-book?ledgerId=${entry === null || entry === void 0 ? void 0 : (_entry_field_debit_account = entry.field_debit_account) === null || _entry_field_debit_account === void 0 ? void 0 : _entry_field_debit_account.id}`,
                                                         children: entry === null || entry === void 0 ? void 0 : (_entry_field_debit_account1 = entry.field_debit_account) === null || _entry_field_debit_account1 === void 0 ? void 0 : _entry_field_debit_account1.field_ledger_account_name
                                                     })
                                                 }),
-                                                /*#__PURE__*/ _jsx(AmountTotal, {
-                                                    amt: entry === null || entry === void 0 ? void 0 : entry.field_amount
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    children: /*#__PURE__*/ _jsx(AmountTotal, {
+                                                        amt: entry === null || entry === void 0 ? void 0 : entry.field_amount
+                                                    })
                                                 })
                                             ]
                                         })
                                     ]
                                 }),
                                 /*#__PURE__*/ _jsxs("div", {
+                                    className: "p-4",
                                     children: [
                                         /*#__PURE__*/ _jsx("div", {
                                             className: "font-semibold",
                                             children: "Credit"
                                         }),
                                         /*#__PURE__*/ _jsxs("div", {
-                                            className: "mx-4 pl-4 border-l border-slate-400",
+                                            className: "mx-4 pl-4 border-l-2 border-blue-400",
                                             children: [
                                                 /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-sm tracking-tighter",
                                                     children: /*#__PURE__*/ _jsx("a", {
                                                         href: `/acc-ledger-book?ledgerId=${entry === null || entry === void 0 ? void 0 : (_entry_field_credit_account = entry.field_credit_account) === null || _entry_field_credit_account === void 0 ? void 0 : _entry_field_credit_account.id}`,
                                                         children: entry === null || entry === void 0 ? void 0 : (_entry_field_credit_account1 = entry.field_credit_account) === null || _entry_field_credit_account1 === void 0 ? void 0 : _entry_field_credit_account1.field_ledger_account_name
                                                     })
                                                 }),
-                                                /*#__PURE__*/ _jsx(AmountTotal, {
-                                                    amt: entry === null || entry === void 0 ? void 0 : entry.field_amount
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    children: /*#__PURE__*/ _jsx(AmountTotal, {
+                                                        amt: entry === null || entry === void 0 ? void 0 : entry.field_amount
+                                                    })
                                                 })
                                             ]
                                         })
@@ -193,7 +210,7 @@ export default function JournalEntry() {
                             }))
                         }),
                         /*#__PURE__*/ _jsx("div", {
-                            className: "text-xs",
+                            className: "text-xs px-4 flex justify-end",
                             children: (entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_ty) ? /*#__PURE__*/ _jsx("div", {
                                 children: (entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_ty) === 'purchase' ? /*#__PURE__*/ _jsx("a", {
                                     className: "border border-slate-300 cursor-pointer p-1",

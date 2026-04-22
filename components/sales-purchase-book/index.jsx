@@ -200,7 +200,12 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
 
               return `${boxes} Box ${units} Units`;
         }
-    
+
+
+
+
+     
+
 
     /**---------------------------------------------------------------------
      * FETCH JOURNAL acc_journal_entry only field_purchase_sale_reference_id
@@ -212,7 +217,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
           ])
           .addFilter(
             'field_purchase_sale_reference_id',
-            data?.map(item => item.drupal_internal__nid),
+            data?.map(item => item.id),
             'IN'
           );
 
@@ -261,7 +266,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
     DATE FILTER FORM
   ------------------------------------------------------*/}
       <form
-        className="flex flex-wrap gap-4 items-end mb-6 p-4 border rounded"
+        className="w-fll flex flex-wrap gap-4 items-end mb-6 p-4 border border-slate-300"
         onSubmit={(e) => e.preventDefault()}
       >
         <div>
@@ -296,7 +301,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
  -------------------------------------------------------------------*/}
     <div className='w-full'>
       <input 
-      className='w-full border border-slate-300 hover:border-slate-300'
+      className='w-full border border-slate-300 focus:outline-slate-500 px-4 py-2 mb-4'
       placeholder='Search Product by Name'
       type='text' 
       value={searchTerm}
@@ -313,59 +318,58 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
             <div>
                 {
                     data && data?.map((item) => {
-                      const isPosted = journalMap.has(String(item.drupal_internal__nid));
-                        return<div key={item.id} className='p-2 my-2 border border-slate-300'>
+                      console.log('item id to JournalMap:', item.id);
+                      const isPosted = journalMap.has(String(item.id));
+                        return<div key={item.id}>
 
                        
                 {/** PRODUCT DETAILS ------------------------------------------------*/}
-                        <div className='py-2 grid grid-cols-2'>
-                            <div className='text-sm font-semibold'>Purchase date:</div>
-                            <div className='text-sm'>{item.field_invoice_date}</div>
-                            <div className='text-sm font-semibold'>Product:</div>
-                            <div className='text-sm font-semibold'>
-                              {item?.field_product_name?.name} - {item?.field_product_size?.name}
-                            </div>
-                            <div className='text-sm font-semibold'>Units Per Box/Case:</div>
-                            <div className='text-sm'>{item.field_unit_per_box}</div>
+                      <div className='border border-slate-300 my-2'>
+                        <div className='border-b border-slate-300 px-2'>
+                          <div className='text-lg font-semibold tracking-tighter'>
+                            {item?.field_product_name?.name} - {item?.field_product_size?.name}
+                          </div>
+                          <div className='flex gap-1 text-xs'>
+                            <div>{item.field_unit_per_box} units per box</div>
+                            <div>.</div>
+                            <div>purchased on {item.field_invoice_date}</div>
+                          </div>
                         </div>
-               
-                {/** AVAILABLE STOCK */}
-                      <div className='py-2'>
-                        <div className='border border-slate-300 p-2'>
-                          <div className='grid grid-cols-5 gap-1 uppercase text-xs font-bold'>
-                            <div className='col-span-2 border-b'>Purchase</div>
-                            <div className='border-b'>Sold</div>
-                            <div className='col-span-2 border-b'>Available stock</div>
-                          </div>
-                          <div className='grid grid-cols-5 text-xs'>
-                            <div>Case/Box</div>
-                            <div>Units</div>
-                            <div>Units</div>
-                            <div>Case/Box</div>
-                            <div>Units</div>
-                          </div>
-                          <div className='grid grid-cols-5 font-bold text-sm'>
-                            <div>{getRemainingStock(item?.field_quantity, item?.field_unit_per_box, 0)}</div>
-                            <div>{item.field_quantity * item.field_unit_per_box}</div>
-                            <div><div className='font-bold'>{soldQtyMap[item.id] || 0}</div></div>
-                            <div>{getRemainingStock(item?.field_quantity, item?.field_unit_per_box, soldQtyMap[item.id])}</div>
-                            <div>{((item?.field_quantity * item?.field_unit_per_box) - (soldQtyMap[item.id] || 0)) || 0}</div>
-                          </div>
-                          
-                        </div>
-                      </div>                    
-    
-                {/** LINK DETAIL VIEW */} 
-                <div className='w-full'>
-                  <a className={`p-2 border border-slate-400 cursor-pointer text-xs w-full
-                  ${isPosted ? 'bg-slate-100' : 'bg-slate-400 text-blue-500'}`}                   
-                  href={`/purchase-post-journal/?uuid=${item.id}`}>
-                     {isPosted ? 'View Details' : 'Post Journal Entry'} - {item.drupal_internal__nid}
-                  </a>
-                 
-                </div>     
 
-            
+
+                        {/** STOCK DETAILS ------------------------------------------------*/}
+                        <div className='grid md:grid-cols-3 text-center border-b border-slate-300'>
+                            <div className='border-r border-slate-300 p-2'>
+                              <div className='uppercase text-xs'>Purchased</div>
+                              <div className='text-lg'>{item.field_quantity * item.field_unit_per_box}</div>
+                              <div className='text-xs'>
+                                {getRemainingStock(item.field_quantity, item.field_unit_per_box, 0) }
+                              </div>
+                            </div>
+                            <div className='p-2'>
+                              <div>Sold</div>
+                              <div className='text-lg'>{soldQtyMap[item.id] || 0}</div>
+                              <div className='text-xs'>units</div> 
+                            </div>
+                            <div className='border-l border-slate-300 p-2'>
+                              <div>Available</div>
+                              <div className='text-lg'>{((item?.field_quantity * item?.field_unit_per_box) - (soldQtyMap[item.id] || 0)) || 0}</div>
+                              <div className='text-xs'>
+                                {getRemainingStock(item.field_quantity, item.field_unit_per_box, soldQtyMap[item.id] || 0)  }
+                              </div>
+                            </div>  
+                        </div>
+                         {/** LINK DETAIL VIEW */} 
+                        <div className='p-2 text-right'>
+                            <div className='w-full'>
+                              <a className={`p-2 border border-slate-400 cursor-pointer text-xs w-full
+                              ${isPosted ? 'bg-white border-none' : 'bg-slate-400 text-blue-500'}`}                   
+                              href={`/purchase-post-journal/?uuid=${item.id}`}>
+                                {isPosted ? 'View Details' : 'Post Journal Entry'} - {item.drupal_internal__nid}
+                              </a>
+                            </div>  
+                        </div>
+                      </div>    
                 </div>
                 })
             }

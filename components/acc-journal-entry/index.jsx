@@ -79,10 +79,8 @@ export default function JournalEntry() {
   -------------------------------------------------- */
   return (
     <div>
-      <PageTitle title="Journal Entries" />
-      <div></div>
 
-    {/* BACK AN DCREATE NEW BUTTON ------------------------------------------ */}
+      {/* BACK AN DCREATE NEW BUTTON ------------------------------------------ */}
       <div className="w-full flex justify-end mb-4 gap-2">
         <button onClick={() => window.history.back()}>
             <Button> ← Back </Button>
@@ -93,77 +91,85 @@ export default function JournalEntry() {
         </a>
       </div>
 
+    {/** PAGE TITLE ---------------------------------------------------------  */}
+      <PageTitle title="Journal Entries" />
+      <div></div>
+
+
       {/* Journal Entry List */}
       { data?.map((entry) => (
         <div
           key={entry?.id}
-          className="my-2 py-4 border-b-2 border-slate-500">
+          className="my-2 py-4 border border-slate-300">
 
-
-{/** DATA AND EDIT BUTTON -------------------------------------------------*/}
-          <div className='flex justify-between'>
-            <div>Date: {entry?.field_date}</div>
+{/** JOURNAL ENTRYd TITLE ------------------------------------------------------ */}
+        <div className='border-b border-slate-300 flex flex-wrap justify-between'>
+          <div className='px-4'>
+            <div className='font-semibold'>{entry?.title}</div>
+            <div className='text-xs'>{entry?.field_date}</div>
+          </div>
+          <div className='px-4'>
             <div className='flex gap-2'>
               <a href={`/node/${entry?.drupal_internal__nid}/edit?destination=/admin/content`}><Button>Edit</Button></a>             
             </div>
-          </div>
+          </div>  
+        </div>
+
 
 {/** DESCRIPTION --------------------------------------------------------- */}
-          <div className="my-2 mx-4 border-l border-slate-400 pl-4">
-            <div className="mt-2 text-xs font-bold uppercase">
+          <div className="my-2 pl-4 flex flex-wrap">
+            <div className="mt-2 text-xs uppercase w-32">
               Description
             </div>
-            <FormattedText>
+            <div className='mt-1 ml-2 text-sm'><FormattedText>
               {entry?.field_description?.processed}
-            </FormattedText>
+            </FormattedText></div>
           </div>
 
 {/** COMMENT ----------------------------------------------------------------- */}
-          <div className="my-2 mx-4 border-l border-slate-400 pl-4">
-            <div className="mt-2 text-xs font-bold uppercase">
+          <div className="my-2 pl-4 flex flex-wrap">
+            <div className="mt-2 text-xs uppercase w-32">
               Comment
             </div>
-            <FormattedText>{entry?.field_comment?.processed}</FormattedText>
+            <div className='mt-1 ml-2 text-sm'><FormattedText>{entry?.field_comment?.processed}</FormattedText></div>
           </div>
 
-{/** TITLE - JOURNAL POST ----------------------------------------------------------------- */}
-        <div className='text-xs'>Jouran Post title: {entry?.title}</div>
 
 
 {/** DEBIT SECTION --------------------------------------------------*/}
-          <div className="flex flex-wrap md:justify-between my-4">
+          <div className="grid md:grid-cols-2 md:justify-between my-4 border-t border-b border-slate-300">
             {/* Debit */}
-            <div>
+            <div className='border-r border-slate-300 p-4'>
               <div className="font-semibold">Debit</div>
-              <div className="mx-4 pl-4 border-l border-slate-400">
-                <div>
+              <div className="mx-4 pl-4 border-l-2 border-blue-400">
+                <div className='text-sm tracking-tighter'>
                   <a href={`/acc-ledger-book?ledgerId=${entry?.field_debit_account?.id}`}>
                   {
                     entry?.field_debit_account?.field_ledger_account_name
                   }
                   </a>
                 </div>
-                <AmountTotal
-                  amt={entry?.field_amount}
-                />
+                <div>
+                  <AmountTotal amt={entry?.field_amount} />
+                </div>
               </div>
             </div>
 
 {/** CREDIT SECTION --------------------------------------------- */}
             {/* Credit */}
-            <div>
+            <div className='p-4'>
               <div className="font-semibold">Credit</div>
-              <div className="mx-4 pl-4 border-l border-slate-400">
-                <div>
+              <div className="mx-4 pl-4 border-l-2 border-blue-400">
+                <div className='text-sm tracking-tighter'>
                   <a href={`/acc-ledger-book?ledgerId=${entry?.field_credit_account?.id}`}> 
                   {
                     entry?.field_credit_account?.field_ledger_account_name
                   }
                   </a>
                 </div>
-                <AmountTotal
-                  amt={entry?.field_amount}
-                />
+                <div>
+                  <AmountTotal amt={entry?.field_amount} />
+                </div>
               </div>
             </div>
           </div>
@@ -189,7 +195,7 @@ export default function JournalEntry() {
 {/**----------------------------------------------------------- 
  * REFERENCE UUID FROM INVOICE AND PURCHASE AUTO-POSTING :
  * ----------------------------------------------------------*/}
-          <div className='text-xs'>
+          <div className='text-xs px-4 flex justify-end'>
 
            { 
            entry?.field_purchase_sale_reference_ty ?

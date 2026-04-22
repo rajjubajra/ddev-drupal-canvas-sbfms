@@ -9,11 +9,7 @@
  */
 
 const AmountTotal = ({amt}) => {
-  return (
-    <div className="text-sm text-blue-600 w-full text-right">
-      <span className="font-bold"> {Number(amt).toFixed(2)}</span>
-    </div>
-  );
+  return (<span className="font-bold text-blue-600"> {Number(amt).toFixed(2)}</span>);
 };
 
 export default AmountTotal;

@@ -196,11 +196,14 @@ console.log('JOurnal DATA', data, error, isLoading);
   -------------------------------------------------- */
   return (
     <div>
-      <PageTitle title="Journal Entries" />
+
+
       
-{/**
+{/**-----------------------------------------------------------
  * BUTTONS - CREATE NEW ENTRY, DISPLAY ITEM NUMBERS, CSV EXPORT
- */}
+ --------------------------------------------------------------*/}
+      
+
       {/* Actions */}
       <div className="w-full flex justify-end mb-4">
         <div className='w-full flex flex-wrap gap-2'>
@@ -230,6 +233,11 @@ console.log('JOurnal DATA', data, error, isLoading);
             onChange={(e) => setItemPerPage(e.target.value)} />
         </div>
       </div>
+
+
+
+      {/** PAGE TITLE ---------------------------------------------------------  */}
+      <PageTitle title="Journal Entries" />
 
 
 
@@ -268,84 +276,99 @@ console.log('JOurnal DATA', data, error, isLoading);
 
 
 
+
+
       {/*---- Journal Entry List ----------------------------------------*/}
       { data?.map((entry) => (
-        <div key={entry.id} className="my-2 py-4 border-b-2 border-slate-500">
-          
-          <div className='flex justify-between'>
-            <div>Date: {entry.field_date}</div>
-            <div className='flex gap-2'>
-              <a href={`/node/${entry.drupal_internal__nid}/edit?destination=/admin/content`}>
-              <Button>Edit</Button>
-              </a>
-            </div>
-          </div>
+        <div
+          key={entry?.id}
+          className="my-2 py-4 border border-slate-300">
 
- {/** DESCRIPTION SECTION ------------------------------------------------------- */}
-          <div className="my-2 mx-4 border-l border-slate-400 pl-4">
-            <div className="mt-2 text-xs font-bold uppercase">
+
+
+
+{/** JOURNAL ENTRYd TITLE ------------------------------------------------------ */}
+        <div className='border-b border-slate-300 flex flex-wrap justify-between'>
+          <div className='px-4'>
+            <div className='font-semibold'>{entry?.title}</div>
+            <div className='text-xs'>{entry?.field_date}</div>
+          </div>
+          <div className='px-4'>
+            <div className='flex gap-2'>
+              <a href={`/node/${entry?.drupal_internal__nid}/edit?destination=/admin/content`}><Button>Edit</Button></a>             
+            </div>
+          </div>  
+        </div>
+
+
+
+{/** DESCRIPTION --------------------------------------------------------- */}
+          <div className="my-2 pl-4 md:flex flex-wrap">
+            <div className="mt-2 text-xs uppercase w-32">
               Description
             </div>
-            <FormattedText>
+            <div className='mt-1 ml-2 text-sm'><FormattedText>
               {entry?.field_description?.processed}
-            </FormattedText>
+            </FormattedText></div>
           </div>
-{/** COMMENTS SECTION --------------------------------------------------------- */}
-          <div className="my-2 mx-4 border-l border-slate-400 pl-4">
-            <div className="mt-2 text-xs font-bold uppercase">
+
+
+        
+{/** COMMENT ----------------------------------------------------------------- */}
+          <div className="my-2 pl-4 md:flex flex-wrap">
+            <div className="mt-2 text-xs uppercase w-32">
               Comment
             </div>
-            <FormattedText>{entry?.field_comment?.processed}</FormattedText>
+            <div className='mt-1 ml-2 text-sm'><FormattedText>{entry?.field_comment?.processed}</FormattedText></div>
           </div>
 
-{/** JOURNENTRY TITLE ------------------------------------------------------- */}
-          <div>{entry.title}</div>
 
 
-
-{/** DEBIT/CREDIT SECTION ------------------------------------------------------ */}
-          <div className="flex flex-wrap md:justify-between my-4">
-    {/* Debit -------------------------------------------*/}
-            <div>
+{/** DEBIT SECTION --------------------------------------------------*/}
+          <div className="grid md:grid-cols-2 md:justify-between my-4 border-t border-b border-slate-300">
+            {/* Debit */}
+            <div className='border-r border-slate-300 p-4'>
               <div className="font-semibold">Debit</div>
-              <div className="mx-4 pl-4 border-l border-slate-400">
-                <div>
+              <div className="mx-4 pl-4 border-l-2 border-blue-400">
+                <div className='text-sm tracking-tighter'>
                   <a href={`/acc-ledger-book?ledgerId=${entry?.field_debit_account?.id}`}>
                   {
-                    entry.field_debit_account.field_ledger_account_name
+                    entry?.field_debit_account?.field_ledger_account_name
                   }
                   </a>
                 </div>
-                <AmountTotal amt={entry.field_amount} />
+                <div>
+                  <AmountTotal amt={entry?.field_amount} />
+                </div>
               </div>
             </div>
-            
-    {/* Credit------------------------------------------- */}
-            <div>
+
+{/** CREDIT SECTION --------------------------------------------- */}
+            {/* Credit */}
+            <div className='p-4'>
               <div className="font-semibold">Credit</div>
-              <div className="mx-4 pl-4 border-l border-slate-400">
-                <div>
-                  <a href={`/acc-ledger-book?ledgerId=${entry?.field_credit_account?.id}`}>
+              <div className="mx-4 pl-4 border-l-2 border-blue-400">
+                <div className='text-sm tracking-tighter'>
+                  <a href={`/acc-ledger-book?ledgerId=${entry?.field_credit_account?.id}`}> 
                   {
-                    entry.field_credit_account.field_ledger_account_name
+                    entry?.field_credit_account?.field_ledger_account_name
                   }
                   </a>
                 </div>
-                <AmountTotal amt={entry.field_amount} />
+                <div>
+                  <AmountTotal amt={entry?.field_amount} />
+                </div>
               </div>
-            </div> 
-          </div>
-
-
+            </div>
+          </div>  
 
 {/** REFERENCE CODE FROM INVOICE AND PURCHASE AUTO POSTING */}
            <div className='text-xs'>
-            <div className='font-bold uppercase'>Auto Post Ref:</div> 
             <div>
               <a
-              className='border border-slate-300 cursor-pointer p-1'  
+              className='flex justify-end cursor-pointer p-1'  
               href={`/purchase-item/?uuid=${entry.field_purchase_sale_reference_id}`}>
-              {entry?.field_purchase_sale_reference_id || 'Manual Post'}
+              {entry?.field_purchase_sale_reference_id || 'Manual Journal Entry'}
               </a>
             </div>
           </div>

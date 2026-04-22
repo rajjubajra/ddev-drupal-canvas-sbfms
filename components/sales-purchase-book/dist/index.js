@@ -138,7 +138,7 @@ export default function purchase_book() {
      * FETCH JOURNAL acc_journal_entry only field_purchase_sale_reference_id
      -----------------------------------------------------------------------*/ const journalParams = new DrupalJsonApiParams().addFields('node--acc_journal_entry', [
         'field_purchase_sale_reference_id'
-    ]).addFilter('field_purchase_sale_reference_id', data === null || data === void 0 ? void 0 : data.map((item)=>item.drupal_internal__nid), 'IN');
+    ]).addFilter('field_purchase_sale_reference_id', data === null || data === void 0 ? void 0 : data.map((item)=>item.id), 'IN');
     const { data: jrn = [] } = useSWR((data === null || data === void 0 ? void 0 : data.length) ? [
         'node--acc_journal_entry',
         'purchase-journal-check',
@@ -180,7 +180,7 @@ export default function purchase_book() {
                 ]
             }),
             /*#__PURE__*/ _jsxs("form", {
-                className: "flex flex-wrap gap-4 items-end mb-6 p-4 border rounded",
+                className: "w-fll flex flex-wrap gap-4 items-end mb-6 p-4 border border-slate-300",
                 onSubmit: (e)=>e.preventDefault(),
                 children: [
                     /*#__PURE__*/ _jsxs("div", {
@@ -216,7 +216,7 @@ export default function purchase_book() {
             /*#__PURE__*/ _jsx("div", {
                 className: "w-full",
                 children: /*#__PURE__*/ _jsx("input", {
-                    className: "w-full border border-slate-300 hover:border-slate-300",
+                    className: "w-full border border-slate-300 focus:outline-slate-500 px-4 py-2 mb-4",
                     placeholder: "Search Product by Name",
                     type: "text",
                     value: searchTerm,
@@ -226,125 +226,117 @@ export default function purchase_book() {
             /*#__PURE__*/ _jsx("div", {
                 children: data && (data === null || data === void 0 ? void 0 : data.map((item)=>{
                     var _item_field_product_name, _item_field_product_size;
-                    const isPosted = journalMap.has(String(item.drupal_internal__nid));
-                    return /*#__PURE__*/ _jsxs("div", {
-                        className: "p-2 my-2 border border-slate-300",
-                        children: [
-                            /*#__PURE__*/ _jsxs("div", {
-                                className: "py-2 grid grid-cols-2",
-                                children: [
-                                    /*#__PURE__*/ _jsx("div", {
-                                        className: "text-sm font-semibold",
-                                        children: "Purchase date:"
-                                    }),
-                                    /*#__PURE__*/ _jsx("div", {
-                                        className: "text-sm",
-                                        children: item.field_invoice_date
-                                    }),
-                                    /*#__PURE__*/ _jsx("div", {
-                                        className: "text-sm font-semibold",
-                                        children: "Product:"
-                                    }),
-                                    /*#__PURE__*/ _jsxs("div", {
-                                        className: "text-sm font-semibold",
-                                        children: [
-                                            item === null || item === void 0 ? void 0 : (_item_field_product_name = item.field_product_name) === null || _item_field_product_name === void 0 ? void 0 : _item_field_product_name.name,
-                                            " - ",
-                                            item === null || item === void 0 ? void 0 : (_item_field_product_size = item.field_product_size) === null || _item_field_product_size === void 0 ? void 0 : _item_field_product_size.name
-                                        ]
-                                    }),
-                                    /*#__PURE__*/ _jsx("div", {
-                                        className: "text-sm font-semibold",
-                                        children: "Units Per Box/Case:"
-                                    }),
-                                    /*#__PURE__*/ _jsx("div", {
-                                        className: "text-sm",
-                                        children: item.field_unit_per_box
-                                    })
-                                ]
-                            }),
-                            /*#__PURE__*/ _jsx("div", {
-                                className: "py-2",
-                                children: /*#__PURE__*/ _jsxs("div", {
-                                    className: "border border-slate-300 p-2",
+                    console.log('item id to JournalMap:', item.id);
+                    const isPosted = journalMap.has(String(item.id));
+                    return /*#__PURE__*/ _jsx("div", {
+                        children: /*#__PURE__*/ _jsxs("div", {
+                            className: "border border-slate-300 my-2",
+                            children: [
+                                /*#__PURE__*/ _jsxs("div", {
+                                    className: "border-b border-slate-300 px-2",
                                     children: [
                                         /*#__PURE__*/ _jsxs("div", {
-                                            className: "grid grid-cols-5 gap-1 uppercase text-xs font-bold",
+                                            className: "text-lg font-semibold tracking-tighter",
                                             children: [
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    className: "col-span-2 border-b",
-                                                    children: "Purchase"
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    className: "border-b",
-                                                    children: "Sold"
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    className: "col-span-2 border-b",
-                                                    children: "Available stock"
-                                                })
+                                                item === null || item === void 0 ? void 0 : (_item_field_product_name = item.field_product_name) === null || _item_field_product_name === void 0 ? void 0 : _item_field_product_name.name,
+                                                " - ",
+                                                item === null || item === void 0 ? void 0 : (_item_field_product_size = item.field_product_size) === null || _item_field_product_size === void 0 ? void 0 : _item_field_product_size.name
                                             ]
                                         }),
                                         /*#__PURE__*/ _jsxs("div", {
-                                            className: "grid grid-cols-5 text-xs",
+                                            className: "flex gap-1 text-xs",
                                             children: [
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: "Case/Box"
+                                                /*#__PURE__*/ _jsxs("div", {
+                                                    children: [
+                                                        item.field_unit_per_box,
+                                                        " units per box"
+                                                    ]
                                                 }),
                                                 /*#__PURE__*/ _jsx("div", {
-                                                    children: "Units"
+                                                    children: "."
                                                 }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: "Units"
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: "Case/Box"
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: "Units"
-                                                })
-                                            ]
-                                        }),
-                                        /*#__PURE__*/ _jsxs("div", {
-                                            className: "grid grid-cols-5 font-bold text-sm",
-                                            children: [
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: getRemainingStock(item === null || item === void 0 ? void 0 : item.field_quantity, item === null || item === void 0 ? void 0 : item.field_unit_per_box, 0)
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: item.field_quantity * item.field_unit_per_box
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: /*#__PURE__*/ _jsx("div", {
-                                                        className: "font-bold",
-                                                        children: soldQtyMap[item.id] || 0
-                                                    })
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: getRemainingStock(item === null || item === void 0 ? void 0 : item.field_quantity, item === null || item === void 0 ? void 0 : item.field_unit_per_box, soldQtyMap[item.id])
-                                                }),
-                                                /*#__PURE__*/ _jsx("div", {
-                                                    children: (item === null || item === void 0 ? void 0 : item.field_quantity) * (item === null || item === void 0 ? void 0 : item.field_unit_per_box) - (soldQtyMap[item.id] || 0) || 0
+                                                /*#__PURE__*/ _jsxs("div", {
+                                                    children: [
+                                                        "purchased on ",
+                                                        item.field_invoice_date
+                                                    ]
                                                 })
                                             ]
                                         })
                                     ]
-                                })
-                            }),
-                            /*#__PURE__*/ _jsx("div", {
-                                className: "w-full",
-                                children: /*#__PURE__*/ _jsxs("a", {
-                                    className: `p-2 border border-slate-400 cursor-pointer text-xs w-full
-                  ${isPosted ? 'bg-slate-100' : 'bg-slate-400 text-blue-500'}`,
-                                    href: `/purchase-post-journal/?uuid=${item.id}`,
+                                }),
+                                /*#__PURE__*/ _jsxs("div", {
+                                    className: "grid md:grid-cols-3 text-center border-b border-slate-300",
                                     children: [
-                                        isPosted ? 'View Details' : 'Post Journal Entry',
-                                        " - ",
-                                        item.drupal_internal__nid
+                                        /*#__PURE__*/ _jsxs("div", {
+                                            className: "border-r border-slate-300 p-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "uppercase text-xs",
+                                                    children: "Purchased"
+                                                }),
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-lg",
+                                                    children: item.field_quantity * item.field_unit_per_box
+                                                }),
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-xs",
+                                                    children: getRemainingStock(item.field_quantity, item.field_unit_per_box, 0)
+                                                })
+                                            ]
+                                        }),
+                                        /*#__PURE__*/ _jsxs("div", {
+                                            className: "p-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    children: "Sold"
+                                                }),
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-lg",
+                                                    children: soldQtyMap[item.id] || 0
+                                                }),
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-xs",
+                                                    children: "units"
+                                                })
+                                            ]
+                                        }),
+                                        /*#__PURE__*/ _jsxs("div", {
+                                            className: "border-l border-slate-300 p-2",
+                                            children: [
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    children: "Available"
+                                                }),
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-lg",
+                                                    children: (item === null || item === void 0 ? void 0 : item.field_quantity) * (item === null || item === void 0 ? void 0 : item.field_unit_per_box) - (soldQtyMap[item.id] || 0) || 0
+                                                }),
+                                                /*#__PURE__*/ _jsx("div", {
+                                                    className: "text-xs",
+                                                    children: getRemainingStock(item.field_quantity, item.field_unit_per_box, soldQtyMap[item.id] || 0)
+                                                })
+                                            ]
+                                        })
                                     ]
+                                }),
+                                /*#__PURE__*/ _jsx("div", {
+                                    className: "p-2 text-right",
+                                    children: /*#__PURE__*/ _jsx("div", {
+                                        className: "w-full",
+                                        children: /*#__PURE__*/ _jsxs("a", {
+                                            className: `p-2 border border-slate-400 cursor-pointer text-xs w-full
+                              ${isPosted ? 'bg-white border-none' : 'bg-slate-400 text-blue-500'}`,
+                                            href: `/purchase-post-journal/?uuid=${item.id}`,
+                                            children: [
+                                                isPosted ? 'View Details' : 'Post Journal Entry',
+                                                " - ",
+                                                item.drupal_internal__nid
+                                            ]
+                                        })
+                                    })
                                 })
-                            })
-                        ]
+                            ]
+                        })
                     }, item.id);
                 }))
             }),
