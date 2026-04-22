@@ -174,6 +174,27 @@ console.log('JOurnal DATA', data, error, isLoading);
 
 
   
+        /**
+ * 
+ * split the string, check the first word and build link accordingly  
+ * 
+ */
+      function generateLink(text) {
+        if (!text) return 'Manual Journal Entry';
+
+        const parts = text.trim().split(' ');
+
+        const type = parts[0];
+        const id = parts[1];
+
+        if (!id) return '';
+
+        if (type === 'purchase') {
+          return <a href={`/purchase-post-journal/?uuid=${id}`}>Go to Purchase</a>;
+        } else {
+          return <a href={`/invoice/?uuid=${id}`}>Go to Invoice</a>;
+        }
+      }
      
 
   
@@ -362,15 +383,11 @@ console.log('JOurnal DATA', data, error, isLoading);
             </div>
           </div>  
 
+
+
 {/** REFERENCE CODE FROM INVOICE AND PURCHASE AUTO POSTING */}
-           <div className='text-xs'>
-            <div>
-              <a
-              className='flex justify-end cursor-pointer p-1'  
-              href={`/purchase-item/?uuid=${entry.field_purchase_sale_reference_id}`}>
-              {entry?.field_purchase_sale_reference_id || 'Manual Journal Entry'}
-              </a>
-            </div>
+          <div className='text-xs px-4 flex justify-end'>  
+            {generateLink(entry?.field_purchase_sale_reference_id)}
           </div>
 
 

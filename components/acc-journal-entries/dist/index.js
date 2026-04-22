@@ -117,6 +117,28 @@ export default function JournalEntriesList() {
         link.click();
         document.body.removeChild(link);
     };
+    /**
+ * 
+ * split the string, check the first word and build link accordingly  
+ * 
+ */ function generateLink(text) {
+        if (!text) return 'Manual Journal Entry';
+        const parts = text.trim().split(' ');
+        const type = parts[0];
+        const id = parts[1];
+        if (!id) return '';
+        if (type === 'purchase') {
+            return /*#__PURE__*/ _jsx("a", {
+                href: `/purchase-post-journal/?uuid=${id}`,
+                children: "Go to Purchase"
+            });
+        } else {
+            return /*#__PURE__*/ _jsx("a", {
+                href: `/invoice/?uuid=${id}`,
+                children: "Go to Invoice"
+            });
+        }
+    }
     /* --------------------------------------------------
      Render States
   -------------------------------------------------- */ {
@@ -339,14 +361,8 @@ export default function JournalEntriesList() {
                             ]
                         }),
                         /*#__PURE__*/ _jsx("div", {
-                            className: "text-xs",
-                            children: /*#__PURE__*/ _jsx("div", {
-                                children: /*#__PURE__*/ _jsx("a", {
-                                    className: "flex justify-end cursor-pointer p-1",
-                                    href: `/purchase-item/?uuid=${entry.field_purchase_sale_reference_id}`,
-                                    children: (entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_id) || 'Manual Journal Entry'
-                                })
-                            })
+                            className: "text-xs px-4 flex justify-end",
+                            children: generateLink(entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_id)
                         }),
                         /*#__PURE__*/ _jsx("div", {
                             className: "flex",

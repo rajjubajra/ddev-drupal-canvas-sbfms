@@ -41,7 +41,7 @@ export default function PurchaseJournalEntry() {
         }
         
         // Then check if journal entry exists
-        return fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${uuidParam}`)
+        return fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${'purchase' + ' ' + String(uuidParam)}`)
           .then(res => res.json())
           .then(result => {
             if (result?.data?.length > 0) {
@@ -175,8 +175,7 @@ export default function PurchaseJournalEntry() {
             title: `Inventory Purchase - ${item?.attributes?.field_product_name?.name}`,
             field_amount: totalAmount,
             field_date: today,
-            field_purchase_sale_reference_id: refId,
-            field_purchase_sale_reference_ty: 'purchase',
+            field_purchase_sale_reference_id: 'purchase' + ' ' + refId,
             field_description: {
               value: `Purchased ${item.attributes.field_quantity} box(es) of ${item?.attributes?.field_product_name?.name}`,
               format: 'plain_text'

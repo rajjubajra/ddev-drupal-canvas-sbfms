@@ -59,7 +59,7 @@ export default function PurchaseJournalEntry() {
                 return;
             }
             // Then check if journal entry exists
-            return fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${uuidParam}`).then((res)=>res.json()).then((result)=>{
+            return fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${'purchase' + ' ' + String(uuidParam)}`).then((res)=>res.json()).then((result)=>{
                 var _result_data;
                 if ((result === null || result === void 0 ? void 0 : (_result_data = result.data) === null || _result_data === void 0 ? void 0 : _result_data.length) > 0) {
                     setJournalEntryNodeId(result.data[0].attributes.drupal_internal__nid);
@@ -165,8 +165,7 @@ export default function PurchaseJournalEntry() {
                             title: `Inventory Purchase - ${item === null || item === void 0 ? void 0 : (_item_attributes = item.attributes) === null || _item_attributes === void 0 ? void 0 : (_item_attributes_field_product_name = _item_attributes.field_product_name) === null || _item_attributes_field_product_name === void 0 ? void 0 : _item_attributes_field_product_name.name}`,
                             field_amount: totalAmount,
                             field_date: today,
-                            field_purchase_sale_reference_id: refId,
-                            field_purchase_sale_reference_ty: 'purchase',
+                            field_purchase_sale_reference_id: 'purchase' + ' ' + refId,
                             field_description: {
                                 value: `Purchased ${item.attributes.field_quantity} box(es) of ${item === null || item === void 0 ? void 0 : (_item_attributes1 = item.attributes) === null || _item_attributes1 === void 0 ? void 0 : (_item_attributes_field_product_name1 = _item_attributes1.field_product_name) === null || _item_attributes_field_product_name1 === void 0 ? void 0 : _item_attributes_field_product_name1.name}`,
                                 format: 'plain_text'
@@ -286,9 +285,11 @@ export default function PurchaseJournalEntry() {
                         className: "flex gap-2 uppercase text-xs font-semibold",
                         children: [
                             /*#__PURE__*/ _jsx("div", {
+                                className: "bg-blue-50",
                                 children: "Purchase"
                             }),
                             /*#__PURE__*/ _jsx("div", {
+                                className: "bg-green-50",
                                 children: "Posted"
                             })
                         ]

@@ -138,7 +138,7 @@ export default function purchase_book() {
      * FETCH JOURNAL acc_journal_entry only field_purchase_sale_reference_id
      -----------------------------------------------------------------------*/ const journalParams = new DrupalJsonApiParams().addFields('node--acc_journal_entry', [
         'field_purchase_sale_reference_id'
-    ]).addFilter('field_purchase_sale_reference_id', data === null || data === void 0 ? void 0 : data.map((item)=>item.id), 'IN');
+    ]).addFilter('field_purchase_sale_reference_id', data === null || data === void 0 ? void 0 : data.map((item)=>'purchase' + ' ' + String(item.id)), 'IN');
     const { data: jrn = [] } = useSWR((data === null || data === void 0 ? void 0 : data.length) ? [
         'node--acc_journal_entry',
         'purchase-journal-check',
@@ -148,6 +148,12 @@ export default function purchase_book() {
     ] : null, ([type, , options])=>client.getCollection(type, options));
     const journalMap = new Set(jrn.map((j)=>j.field_purchase_sale_reference_id));
     /** returns array of field_purchase_sale_reference_id */ console.log('Journal Map: ', journalMap);
+    /** splite the ref id */ const splitRefId = (refId)=>{
+        if (!refId) return null;
+        const parts = refId.split(' ');
+        return refId + ' : ' + parts[0] + ' - ' + parts[1];
+    //return parts.length > 1 ? parts[1] : null;
+    };
     if (isLoading) return /*#__PURE__*/ _jsx("div", {
         children: "Loading...."
     });
@@ -227,7 +233,7 @@ export default function purchase_book() {
                 children: data && (data === null || data === void 0 ? void 0 : data.map((item)=>{
                     var _item_field_product_name, _item_field_product_size;
                     console.log('item id to JournalMap:', item.id);
-                    const isPosted = journalMap.has(String(item.id));
+                    const isPosted = journalMap.has('purchase' + ' ' + String(item.id));
                     return /*#__PURE__*/ _jsx("div", {
                         children: /*#__PURE__*/ _jsxs("div", {
                             className: "border border-slate-300 my-2",

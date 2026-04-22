@@ -66,7 +66,33 @@ export default function JournalEntry() {
         ([type, , options]) => client.getCollection(type, options)
       );
 
-     console.log('JOURNAL ENTRIES : ',data);
+          console.log('JOURNAL ENTRIES : ',data);
+
+
+
+/**
+ * 
+ * split the string, check the first word and build link accordingly  
+ * 
+ */
+      function generateLink(text) {
+        if (!text) return 'Manual Journal Entry';
+
+        const parts = text.trim().split(' ');
+
+        const type = parts[0];
+        const id = parts[1];
+
+        if (!id) return '';
+
+        if (type === 'purchase') {
+          return <a href={`/purchase-post-journal/?uuid=${id}`}>Go to Purchase</a>;
+        } else {
+          return <a href={`/invoice/?uuid=${id}`}>Go to Invoice</a>;
+        }
+      }
+
+
     
   /* --------------------------------------------------
      Render States
@@ -198,18 +224,10 @@ export default function JournalEntry() {
           <div className='text-xs px-4 flex justify-end'>
 
            { 
-           entry?.field_purchase_sale_reference_ty ?
-            <div>
-              {
-                entry?.field_purchase_sale_reference_ty === 'purchase'
-                ? <a
-                    className='border border-slate-300 cursor-pointer p-1'  
-                    href={`/sales-purchase-item/?nodeId=${entry?.field_purchase_sale_reference_id}`}>
-                    View Purchase
-                  </a>
-                :  <a href={`/sales-invoice-copy/?nodeId=${entry?.field_purchase_sale_reference_id}`}>Veiw Invoice</a>
-              }
-            </div>
+           entry?.field_purchase_sale_reference_id !== '' ?
+            
+                generateLink(entry?.field_purchase_sale_reference_id)  
+            
            : 'Manual Journal Entry'
            
            }

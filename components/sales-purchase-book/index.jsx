@@ -204,9 +204,6 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
 
 
 
-     
-
-
     /**---------------------------------------------------------------------
      * FETCH JOURNAL acc_journal_entry only field_purchase_sale_reference_id
      -----------------------------------------------------------------------*/
@@ -217,7 +214,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
           ])
           .addFilter(
             'field_purchase_sale_reference_id',
-            data?.map(item => item.id),
+            data?.map(item => 'purchase' + ' ' + String(item.id)), // ['purchase 123', 'purchase 124', ...]
             'IN'
           );
 
@@ -238,6 +235,9 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
        
         /** returns array of field_purchase_sale_reference_id */
          console.log('Journal Map: ',journalMap);
+
+
+
 
     if(isLoading) return <div>Loading....</div>
 
@@ -319,7 +319,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
                 {
                     data && data?.map((item) => {
                       console.log('item id to JournalMap:', item.id);
-                      const isPosted = journalMap.has(String(item.id));
+                      const isPosted = journalMap.has('purchase' + ' '  + String(item.id));
                         return<div key={item.id}>
 
                        
@@ -365,7 +365,7 @@ const [debouncedSearch, setDebouncedSearch] = useState('');
                               <a className={`p-2 border border-slate-400 cursor-pointer text-xs w-full
                               ${isPosted ? 'bg-white border-none' : 'bg-slate-400 text-blue-500'}`}                   
                               href={`/purchase-post-journal/?uuid=${item.id}`}>
-                                {isPosted ? 'View Details' : 'Post Journal Entry'} - {item.drupal_internal__nid}
+                                 {isPosted ? 'View Details' : 'Post Journal Entry'} - {item.drupal_internal__nid}
                               </a>
                             </div>  
                         </div>

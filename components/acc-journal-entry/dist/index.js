@@ -40,6 +40,28 @@ export default function JournalEntry() {
         }
     ] : null, ([type, , options])=>client.getCollection(type, options));
     console.log('JOURNAL ENTRIES : ', data);
+    /**
+ * 
+ * split the string, check the first word and build link accordingly  
+ * 
+ */ function generateLink(text) {
+        if (!text) return 'Manual Journal Entry';
+        const parts = text.trim().split(' ');
+        const type = parts[0];
+        const id = parts[1];
+        if (!id) return '';
+        if (type === 'purchase') {
+            return /*#__PURE__*/ _jsx("a", {
+                href: `/purchase-post-journal/?uuid=${id}`,
+                children: "Go to Purchase"
+            });
+        } else {
+            return /*#__PURE__*/ _jsx("a", {
+                href: `/invoice/?uuid=${id}`,
+                children: "Go to Invoice"
+            });
+        }
+    }
     /* --------------------------------------------------
      Render States
   -------------------------------------------------- */ if (error) return 'An error has occurred.';
@@ -211,16 +233,7 @@ export default function JournalEntry() {
                         }),
                         /*#__PURE__*/ _jsx("div", {
                             className: "text-xs px-4 flex justify-end",
-                            children: (entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_ty) ? /*#__PURE__*/ _jsx("div", {
-                                children: (entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_ty) === 'purchase' ? /*#__PURE__*/ _jsx("a", {
-                                    className: "border border-slate-300 cursor-pointer p-1",
-                                    href: `/sales-purchase-item/?nodeId=${entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_id}`,
-                                    children: "View Purchase"
-                                }) : /*#__PURE__*/ _jsx("a", {
-                                    href: `/sales-invoice-copy/?nodeId=${entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_id}`,
-                                    children: "Veiw Invoice"
-                                })
-                            }) : 'Manual Journal Entry'
+                            children: (entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_id) !== '' ? generateLink(entry === null || entry === void 0 ? void 0 : entry.field_purchase_sale_reference_id) : 'Manual Journal Entry'
                         })
                     ]
                 }, entry === null || entry === void 0 ? void 0 : entry.id);
