@@ -1,3 +1,212 @@
+# Drupal Configuration Import Guide (Content Types & Fields)
+
+This project stores all Drupal configuration (content types, fields, displays, etc.) in:
+
+```
+/config/sync
+```
+
+Follow the steps below to recreate the full site structure (e.g. Invoice, Journal Entry, Ledger) on a new Drupal installation.
+
+---
+
+## 📦 Prerequisites
+
+* Drupal installed
+* Drush installed
+* Database configured and working
+* Same/conpatible Drupal core & modules enabled
+
+---
+
+## ⚙️ Step 1 — Clone the Repository
+
+```
+git clone <your-repo-url>
+cd <project-folder>
+```
+
+---
+
+## ⚙️ Step 2 — Configure settings.php
+
+Open:
+
+```
+web/sites/default/settings.php
+```
+
+Add or update:
+
+```php
+$settings['config_sync_directory'] = '../config/sync';
+```
+
+---
+
+## ⚙️ Step 3 — Install Required Modules
+
+Make sure all required modules are enabled before importing config:
+
+```
+drush en node field text user system -y
+```
+
+Also enable any custom/contrib modules used in this project.
+
+---
+
+## ⚙️ Step 4 — Import Configuration
+
+Run:
+
+```
+drush cim -y
+```
+
+This will create:
+
+* Content types (e.g. Invoice, Journal Entry)
+* Fields
+* Taxonomies
+* Form displays
+* View displays
+
+---
+
+## ⚙️ Step 5 — Run Database Updates
+
+```
+drush updb -y
+```
+
+---
+
+## ⚙️ Step 6 — Clear Cache
+
+```
+drush cr
+```
+
+---
+
+## ✅ Done
+
+Your content structure is now ready.
+
+---
+
+## ⚠️ Important Notes
+
+### 1. Do NOT modify config directly in production
+
+Always:
+
+* Change locally
+* Export with `drush cex`
+* Commit to Git
+* Deploy
+
+---
+
+### 2. Config will overwrite structure
+
+Running:
+
+```
+drush cim
+```
+
+will:
+
+* overwrite existing config
+* remove config not present in `/config/sync`
+
+---
+
+### 3. Never delete fields with existing data
+
+If a field is removed from config:
+
+* Drupal may delete it
+* Existing data can be lost
+
+Instead:
+
+* hide fields from display
+* keep them in config if data exists
+
+---
+
+### 4. Safe workflow
+
+1. Develop locally (DDEV)
+2. Export config:
+
+   ```
+   ddev drush cex
+   ```
+3. Commit:
+
+   ```
+   git add config/sync
+   git commit -m "Update config"
+   ```
+4. Deploy and import:
+
+   ```
+   drush cim -y
+   ```
+
+---
+
+## 🧠 Concept
+
+* Config = Structure (content types, fields)
+* Content = Data (nodes, invoices, journal entries)
+
+This repo only manages structure.
+
+---
+
+## 🧯 Troubleshooting
+
+### Config import fails
+
+Run:
+
+```
+drush config:status
+```
+
+Check missing modules or dependencies.
+
+---
+
+### Site breaks after import
+
+Restore database backup and re-check config differences before importing again.
+
+---
+
+## 📌 Notes for SBFMS Project
+
+This system relies heavily on:
+
+* Journal Entries
+* Ledger Accounts
+* Invoices
+* Financial Year
+
+All structure is controlled via configuration.
+Always test config changes with real data before deploying.
+
+---
+
+
+
+
+
  It provides clear, step‑by‑step instructions for installing DDEV on Windows and running your Drupal project locally with the provided `db.sql` file.
 
 ```markdown

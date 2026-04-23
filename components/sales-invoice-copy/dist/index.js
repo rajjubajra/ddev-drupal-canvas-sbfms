@@ -5,6 +5,8 @@ import { JsonApiClient } from 'drupal-canvas';
 import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
 import { FormattedText } from 'drupal-canvas';
 import PageTitle from '@/components/utl-page-title';
+import Button from '@/components/utl-button';
+import AmountTotal from '@/components/utl-amount-total';
 import Amount from '@/components/utl-amount';
 const client = new JsonApiClient();
 export default function sales_invoice_copy() {
@@ -39,23 +41,82 @@ export default function sales_invoice_copy() {
     });
     return /*#__PURE__*/ _jsxs("div", {
         children: [
+            /*#__PURE__*/ _jsx("div", {
+                className: "flex justify-end",
+                children: /*#__PURE__*/ _jsx(Button, {
+                    children: /*#__PURE__*/ _jsx("button", {
+                        className: "cursor-pointer",
+                        onClick: ()=>window.history.back(),
+                        children: "← Back"
+                    })
+                })
+            }),
             /*#__PURE__*/ _jsx(PageTitle, {
                 title: "Invoice Copy"
             }),
             /*#__PURE__*/ _jsxs("div", {
                 children: [
                     /*#__PURE__*/ _jsxs("div", {
+                        className: "flex justify-between py-4 border-b border-slate-300",
                         children: [
                             /*#__PURE__*/ _jsxs("div", {
                                 children: [
-                                    "Date: ",
-                                    data[0].field_invoice_date
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        className: "font-bold",
+                                        children: [
+                                            "Invoice - ",
+                                            data[0].field_invoice_number
+                                        ]
+                                    }),
+                                    /*#__PURE__*/ _jsx("div", {
+                                        className: "text-xs",
+                                        children: data[0].field_invoice_date
+                                    })
+                                ]
+                            }),
+                            /*#__PURE__*/ _jsx("div", {
+                                children: /*#__PURE__*/ _jsx("div", {
+                                    className: "text-xs",
+                                    children: data[0].field_customer_id.field_customer_code
+                                })
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ _jsxs("div", {
+                        className: "grid md:grid-cols-2 py-4 border-b border-slate-300",
+                        children: [
+                            /*#__PURE__*/ _jsxs("div", {
+                                children: [
+                                    /*#__PURE__*/ _jsx("div", {
+                                        className: "font-semibold",
+                                        children: data[0].field_customer_id.title
+                                    }),
+                                    /*#__PURE__*/ _jsx("div", {
+                                        className: "text-xs",
+                                        children: /*#__PURE__*/ _jsx(FormattedText, {
+                                            children: data[0].field_customer_id.field_address.value
+                                        })
+                                    })
                                 ]
                             }),
                             /*#__PURE__*/ _jsxs("div", {
+                                className: "text-xs border-l border-slate-300 pl-4",
                                 children: [
-                                    "Invoice Number: ",
-                                    data[0].field_invoice_number
+                                    /*#__PURE__*/ _jsx("div", {
+                                        className: "flex gap-2",
+                                        children: (_data__field_customer_id_field_phone_number = data[0].field_customer_id.field_phone_number) === null || _data__field_customer_id_field_phone_number === void 0 ? void 0 : _data__field_customer_id_field_phone_number.map((item)=>/*#__PURE__*/ _jsx("div", {
+                                                children: item
+                                            }))
+                                    }),
+                                    /*#__PURE__*/ _jsx("div", {
+                                        children: data[0].field_customer_id.field_email
+                                    }),
+                                    /*#__PURE__*/ _jsxs("div", {
+                                        children: [
+                                            "Tax Id: ",
+                                            data[0].field_customer_id.field_tax_id
+                                        ]
+                                    })
                                 ]
                             })
                         ]
@@ -64,51 +125,7 @@ export default function sales_invoice_copy() {
                         className: "my-2",
                         children: [
                             /*#__PURE__*/ _jsxs("div", {
-                                children: [
-                                    "Customer Code: ",
-                                    data[0].field_customer_id.field_customer_code
-                                ]
-                            }),
-                            /*#__PURE__*/ _jsx("div", {
-                                children: data[0].field_customer_id.title
-                            }),
-                            /*#__PURE__*/ _jsx("div", {
-                                children: /*#__PURE__*/ _jsx(FormattedText, {
-                                    children: data[0].field_customer_id.field_address.value
-                                })
-                            }),
-                            /*#__PURE__*/ _jsxs("div", {
-                                className: "flex",
-                                children: [
-                                    /*#__PURE__*/ _jsx("div", {
-                                        children: "Phone:"
-                                    }),
-                                    " ",
-                                    (_data__field_customer_id_field_phone_number = data[0].field_customer_id.field_phone_number) === null || _data__field_customer_id_field_phone_number === void 0 ? void 0 : _data__field_customer_id_field_phone_number.map((item)=>/*#__PURE__*/ _jsx("div", {
-                                            className: "mx-2",
-                                            children: item
-                                        }))
-                                ]
-                            }),
-                            /*#__PURE__*/ _jsxs("div", {
-                                children: [
-                                    "Email:  ",
-                                    data[0].field_customer_id.field_email
-                                ]
-                            }),
-                            /*#__PURE__*/ _jsxs("div", {
-                                children: [
-                                    "Tax Id: ",
-                                    data[0].field_customer_id.field_tax_id
-                                ]
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ _jsxs("div", {
-                        className: "my-2 border-t border-b",
-                        children: [
-                            /*#__PURE__*/ _jsxs("div", {
-                                className: "flex gap-2",
+                                className: "flex gap-2 border-b border-slate-300",
                                 children: [
                                     /*#__PURE__*/ _jsx("div", {
                                         className: "w-96",
@@ -119,18 +136,18 @@ export default function sales_invoice_copy() {
                                         children: "Qty"
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
-                                        className: "w-32",
+                                        className: "w-32 text-right",
                                         children: "Rate"
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
-                                        className: "w-32",
+                                        className: "w-32 text-right",
                                         children: "Amount"
                                     })
                                 ]
                             }),
                             (_data__field_sales_invoice_items = data[0].field_sales_invoice_items) === null || _data__field_sales_invoice_items === void 0 ? void 0 : _data__field_sales_invoice_items.map((item)=>{
                                 return /*#__PURE__*/ _jsxs("div", {
-                                    className: "flex gap-2",
+                                    className: "flex gap-2 border-b border-slate-300 py-1",
                                     children: [
                                         /*#__PURE__*/ _jsx("div", {
                                             className: "w-96",
@@ -156,21 +173,21 @@ export default function sales_invoice_copy() {
                                 }, item.id);
                             }),
                             /*#__PURE__*/ _jsxs("div", {
-                                className: "flex gap-2 my-2 border-t border-slate-300",
+                                className: "flex gap-2 py-2 border-t border-b border-slate-300",
                                 children: [
                                     /*#__PURE__*/ _jsx("div", {
-                                        className: "w-96",
-                                        children: "Total Amount"
+                                        className: "w-96"
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
                                         className: "w-12"
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
-                                        className: "w-32"
+                                        className: "w-32 uppercase text-xs flex justify-end items-center",
+                                        children: "Total Amount"
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
-                                        className: "w-32",
-                                        children: /*#__PURE__*/ _jsx(Amount, {
+                                        className: "w-32 text-lg text-right",
+                                        children: /*#__PURE__*/ _jsx(AmountTotal, {
                                             amt: (_data_ = data[0]) === null || _data_ === void 0 ? void 0 : _data_.field_total_amount
                                         })
                                     })
@@ -179,14 +196,14 @@ export default function sales_invoice_copy() {
                         ]
                     }),
                     /*#__PURE__*/ _jsxs("div", {
-                        className: "py-2",
+                        className: "py-2 border-b border-slate-300",
                         children: [
                             /*#__PURE__*/ _jsx("div", {
                                 children: "Note:"
                             }),
                             /*#__PURE__*/ _jsx("div", {
                                 children: /*#__PURE__*/ _jsx(FormattedText, {
-                                    children: (_data_1 = data[0]) === null || _data_1 === void 0 ? void 0 : (_data__field_notes = _data_1.field_notes) === null || _data__field_notes === void 0 ? void 0 : _data__field_notes.value
+                                    children: data[0] ? (_data_1 = data[0]) === null || _data_1 === void 0 ? void 0 : (_data__field_notes = _data_1.field_notes) === null || _data__field_notes === void 0 ? void 0 : _data__field_notes.value : '---'
                                 })
                             })
                         ]

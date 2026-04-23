@@ -250,6 +250,7 @@ export default function InvoiceForm() {
 
   // Validate form before submission
   const validateForm = () => {
+    
     if (!formData.title?.trim()) {
       alert('Please enter an invoice title');
       return false;
@@ -305,11 +306,16 @@ async function createJournalEntries(invoiceId) {
 
     const refString = `${invoiceId}-${today}`;
 
-    const nodeId = productItems.nodeId;
+    // Get nodeId from the first product item
+    const nodeId = productItems[0]?.nodeId;
 
-    const createdJournalIds = [];
+    // Only create journal entries if we have a valid nodeId
+    if (!nodeId) {
+      console.warn('No nodeId available for journal entries');
+      return;
+    }
 
-    console.log('total Amount', totalAmount, 'total COGS', totalCOGS, 'node id', nodeId, 'refString' , refString,'Journal ids' ,createdJournalIds)
+    console.log('total Amount', totalAmount, 'total COGS', totalCOGS, 'node id', nodeId, 'refString', refString);
     
     // -------- Revenue Entry --------
     const revenueEntry = {
@@ -334,13 +340,13 @@ async function createJournalEntries(invoiceId) {
           field_debit_account: {
             data: {
               type: "node--accounting_ledger",
-              id: "7ddaeb62-5374-4190-bab6-6615ca057af1" // Accounts Receivable / Cash
+              id: "91ff33c2-6d0d-4876-9746-e1551585f29e" // Accounts Receivable / Cash
             }
           },
           field_credit_account: {
             data: {
               type: "node--accounting_ledger",
-              id: "66bc7006-f8fc-461a-8164-c1f2fefc2fc7" // Revenue
+              id: "4f7d0b0f-0a5a-421d-ab45-47779da5ecc0" // Sales Revenue
             }
           }
         }
@@ -370,13 +376,13 @@ async function createJournalEntries(invoiceId) {
           field_debit_account: {
             data: {
               type: "node--accounting_ledger",
-              id: "0fd1c99a-1b20-4ecd-9401-62860ef98fd0" // COGS Expense
+              id: "d030ea84-af4f-4f2e-a1a7-313b560181fc" // COGS Expense
             }
           },
           field_credit_account: {
             data: {
               type: "node--accounting_ledger",
-              id: "c23fb1c0-c533-4b28-a4e9-064184788471" // Inventory
+              id: "c5343609-65ee-4e0d-926e-20104956edd9" // Inventory
             }
           }
         }
@@ -396,7 +402,7 @@ async function createJournalEntries(invoiceId) {
     });
 
     const data1 = await res1.json();
-    createdJournalIds.push(data1.data.attributes.drupal_internal__nid);
+    console.log('Revenue entry response:', data1);
 
     // -------- POST COGS --------
     if (totalCOGS > 0) {
@@ -412,14 +418,14 @@ async function createJournalEntries(invoiceId) {
       });
 
       const data2 = await res2.json();
-      createdJournalIds.push(data2.data.attributes.drupal_internal__nid);
+      console.log('COGS entry response:', data2);
     }
 
 
-    // ✅ Redirect
+    // ✅ Redirect commented out - can be enabled if needed
     /** 
-    if (createdJournalIds.length > 0) {
-      window.location.href = `/acc-journal-entry?nodeId=${createdJournalIds.join(',')}`;
+    if (data2?.data?.attributes?.drupal_internal__nid) {
+      window.location.href = `/acc-journal-entry?nodeId=${data1.data.attributes.drupal_internal__nid},${data2.data.attributes.drupal_internal__nid}`;
     }
     */
 
@@ -591,20 +597,15 @@ async function createJournalEntries(invoiceId) {
                   throw new Error(`HTTP error ${response.status}`);
                 }
 
-
-                setSubmitSuccess(true);
-                
-                 // ✅ Parse JSON ONCE
+                // Parse JSON
                 const result = await response.json();
 
                 console.log('INVOICE RESULT:', result);
 
-                // ✅ Extract nid
+                // Extract nid
                 const nid = result?.data?.attributes?.drupal_internal__nid;
 
-                setSubmitSuccess(true);
-
-                // ✅ Return ONLY nid (clean)
+                // Return nid - don't set submitSuccess here, let parent handle it
                 return nid;
              
 
@@ -620,22 +621,29 @@ async function createJournalEntries(invoiceId) {
  */
   const postInvoice = async () => {
 
-  if (submitSuccess) return; // ✅ move here
+  if (submitSuccess) return;
 
   try {
     setIsSubmitting(true);
+    setSubmitError(null);
 
     const createdItemId = await prepareInvoiceItems();
-    if (!createdItemId) return; // ✅ safety
+    if (!createdItemId || createdItemId.length === 0) {
+      throw new Error('Failed to create invoice items');
+    }
 
     const nodeId = await prepareInvoice(createdItemId);
+    if (!nodeId) {
+      throw new Error('Failed to create invoice');
+    }
 
     await createJournalEntries(nodeId);
 
     setSubmitSuccess(true);
 
   } catch (err) {
-    setSubmitError(err);
+    console.error('Invoice submission error:', err);
+    setSubmitError(err.message || 'Failed to create invoice');
   } finally {
     setIsSubmitting(false);
   }
@@ -647,7 +655,34 @@ async function createJournalEntries(invoiceId) {
    * UI - return
    -----------------------------------------------*/
 
-  if(submitSuccess) return <div>Invoice Submitted</div>
+  const handleCreateNew = () => {
+    // Reset all state to allow creating a new invoice
+    setFormData({
+      title: '',
+      customerId: null,
+      customerTitle: '',
+      customerAddress: '',
+      invoice_date: dateToday,
+      notes: ''
+    });
+    setProductItems([]);
+    setSubmitSuccess(false);
+    setSubmitError(null);
+  };
+
+  if (submitSuccess) return (
+    <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-6 text-center">
+      <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        Invoice created successfully!
+      </div>
+      <button
+        onClick={handleCreateNew}
+        className="border px-4 py-2 rounded hover:bg-gray-100"
+      >
+        Create Another Invoice
+      </button>
+    </div>
+  );
 
 
   return (
@@ -755,9 +790,10 @@ async function createJournalEntries(invoiceId) {
           <label className="block mb-1 font-medium">Invoice Title *</label>
           <input
             type='text'
-            value={`INVOICE - ${formData.title}`}
+            value={formData.title}
             placeholder='Invoice Title'
-            className='border p-2 border-slate-200 w-full mb-2 rounded hidden'
+            className='border p-2 border-slate-200 w-full mb-2 rounded'
+            onChange={(e) => setFormData({...formData, title: e.target.value})}
           />
         </div>
 

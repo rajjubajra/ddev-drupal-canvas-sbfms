@@ -263,12 +263,12 @@ export default function InvoiceForm() {
     }
     // Validate form before submission
     const validateForm = ()=>{
-        var _formData_title;
-        if (!((_formData_title = formData.title) === null || _formData_title === void 0 ? void 0 : _formData_title.trim())) {
-            alert('Please enter an invoice title');
-            return false;
-        }
-        if (!formData.customerId) {
+        /**
+    if (!formData.title?.trim()) {
+      alert('Please enter an invoice title');
+      return false;
+    }
+    */ if (!formData.customerId) {
             alert('Please select a customer');
             return false;
         }
@@ -385,6 +385,7 @@ export default function InvoiceForm() {
                     body: JSON.stringify(revenueEntry)
                 });
                 const data1 = yield res1.json();
+                console.log('Revenue entry response:', data1);
                 createdJournalIds.push(data1.data.attributes.drupal_internal__nid);
                 // -------- POST COGS --------
                 if (totalCOGS > 0) {
@@ -399,6 +400,7 @@ export default function InvoiceForm() {
                         body: JSON.stringify(cogsEntry)
                     });
                     const data2 = yield res2.json();
+                    console.log('COGS entry response:', data2);
                     createdJournalIds.push(data2.data.attributes.drupal_internal__nid);
                 }
             // ✅ Redirect

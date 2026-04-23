@@ -6,6 +6,7 @@ import { FormattedText } from 'drupal-canvas';
 
 import PageTitle from '@/components/utl-page-title';
 import Button from '@/components/utl-button';
+import AmountTotal from '@/components/utl-amount-total';
 import Amount from '@/components/utl-amount';
 
 
@@ -61,46 +62,68 @@ export default function sales_invoice_copy() {
 
   return (
     <div>
+      <div className='flex justify-end'>
+        <Button>
+        <button className='cursor-pointer' onClick={() => window.history.back()}>
+             ← Back 
+        </button>
+        </Button>
+      </div>
+
+      
       <PageTitle title='Invoice Copy' />
 
       <div>
         
-        {/** DATE AND INVOICE NUMBER */}
-        <div>
-        <div>Date: {data[0].field_invoice_date}</div>
-        <div>Invoice Number: {data[0].field_invoice_number}</div>
+    {/** Invoice number, date ---------------------------------------------------------- */}
+        <div className='flex justify-between py-4 border-b border-slate-300'>
+          <div>
+            <div className='font-bold'>Invoice - {data[0].field_invoice_number}</div>
+            <div className='text-xs'>{data[0].field_invoice_date}</div>
+          </div>
+          <div>
+            <div className='text-xs'>{data[0].field_customer_id.field_customer_code}</div>
+          </div>
         </div>
 
-        {/** CUSTOMER DETAILS */}
+
+    {/** Client Details ----------------------------------------------------------------*/}
+        <div className='grid md:grid-cols-2 py-4 border-b border-slate-300'>
+          <div>
+              <div className='font-semibold'>{data[0].field_customer_id.title}</div>
+              <div className='text-xs'>
+                <FormattedText>
+                  {data[0].field_customer_id.field_address.value}
+                </FormattedText>
+              </div>
+          </div>
+          
+          <div className='text-xs border-l border-slate-300 pl-4'>
+              <div className='flex gap-2'>
+                {data[0].field_customer_id.field_phone_number?.map((item) => <div>{item}</div>)}
+              </div>
+              <div>
+                {data[0].field_customer_id.field_email}
+              </div>
+              <div>
+                Tax Id: {data[0].field_customer_id.field_tax_id}
+              </div>
+          </div>
+        </div>
+
+
+        
+
         <div className='my-2'>
-          <div>Customer Code: {data[0].field_customer_id.field_customer_code}</div>
-          <div>{data[0].field_customer_id.title}</div>
-          <div>
-            <FormattedText>
-              {data[0].field_customer_id.field_address.value}
-            </FormattedText>
-          </div>
-          <div className='flex'>
-            <div>Phone:</div> {data[0].field_customer_id.field_phone_number?.map((item) => <div className='mx-2'>{item}</div>)}
-          </div>
-          <div>
-            Email:  {data[0].field_customer_id.field_email}
-          </div>
-          <div>
-            Tax Id: {data[0].field_customer_id.field_tax_id}
-          </div>
-        </div>
-
-        <div className='my-2 border-t border-b'>
-          <div className='flex gap-2'>
+          <div className='flex gap-2 border-b border-slate-300'>
             <div className='w-96'>Product</div>
             <div className='w-12'>Qty</div>
-            <div className='w-32'>Rate</div>
-            <div className='w-32'>Amount</div>
+            <div className='w-32 text-right'>Rate</div>
+            <div className='w-32 text-right'>Amount</div>
           </div>
           {
             data[0].field_sales_invoice_items?.map((item) => {
-              return<div key={item.id} className='flex gap-2'>
+              return<div key={item.id} className='flex gap-2 border-b border-slate-300 py-1'>
                 <div className='w-96'>{item?.title}</div>
                 <div className='w-12'>{item?.field_product_quantity_units}</div>
                 <div className='w-32'><Amount amt={item?.field_product_unit_price} /></div>
@@ -108,17 +131,17 @@ export default function sales_invoice_copy() {
               </div>
             })
           }
-          <div className='flex gap-2 my-2 border-t border-slate-300'>
-            <div className='w-96'>Total Amount</div>
+          <div className='flex gap-2 py-2 border-t border-b border-slate-300'>
+            <div className='w-96'></div>
             <div className='w-12'></div>
-            <div className='w-32'></div>
-            <div className='w-32'><Amount amt={data[0]?.field_total_amount} /></div>
+            <div className='w-32 uppercase text-xs flex justify-end items-center'>Total Amount</div>
+            <div className='w-32 text-lg text-right'><AmountTotal amt={data[0]?.field_total_amount} /></div>
           </div>
         </div>  
 
-          <div className='py-2'>
+          <div className='py-2 border-b border-slate-300'>
             <div>Note:</div>
-            <div><FormattedText>{data[0]?.field_notes?.value}</FormattedText></div>
+            <div><FormattedText>{data[0] ? data[0]?.field_notes?.value : '---'}</FormattedText></div>
           </div>
 
       </div>
