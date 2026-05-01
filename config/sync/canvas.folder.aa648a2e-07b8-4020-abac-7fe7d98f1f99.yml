@@ -35,6 +35,7 @@ items:
   - js.revenue
   - js.sales-invoice-copy
   - js.sales-invoice-form
+  - js.sales-invoice-post-journal
   - js.sales-purchase-book
   - js.sales-purchase-journal-entry
   - js.sales-sales-book
