@@ -467,6 +467,17 @@ export default function InvoiceForm() {
   }
 
 
+
+
+
+/** update date and title */
+  const [invoiceTitle, setInvoiceTitle] = useState('');
+  const [invoiceDate, setInvoiceDate] = useState(dateToday);
+  useEffect(() => {
+    setFormData({...formData, title: 'Invoice - ' + dateToday});
+  }, []);
+
+
 /**
  * 
  * @returns POST INVOICE WITH RELATIONSHIP WITH INVOICE_ITEMS UUID
@@ -538,6 +549,10 @@ export default function InvoiceForm() {
   );
 
 
+
+  /**
+   * UI - MAIN INVOICE FORM
+   */
   return (
     <div>
 
@@ -559,6 +574,20 @@ export default function InvoiceForm() {
         )}
 
 
+
+{/*---------------- Invoice Title : ----------------------------------------------------- */}
+        <div className='border p-4 rounded border-slate-200'>
+          <label className="block mb-1 font-medium">Invoice Title *</label>
+          <input
+            type='text'
+            value={formData.title}
+            placeholder='Invoice Title'
+            className='border p-2 border-slate-200 w-full mb-2 rounded'
+            onChange={(e) => setFormData({...formData, title: e.target.value})}
+          />
+        </div>
+
+
 {/*--------------- Invoice Date and Number---------------------- */}
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -566,13 +595,14 @@ export default function InvoiceForm() {
             <div className='flex gap-2'>
             <input
               type='date'
-              value={formData.invoice_date}
+              value={invoiceDate}
               className='p-2'
               onChange={(e) => setFormData({...formData, invoice_date: e.target.value})}
               required
             />
             <input 
               type='text' 
+              hidden={true}
               value={formData.invoiceNumber} 
               className='p-2 w-full border-none' 
               readOnly />
@@ -635,19 +665,6 @@ export default function InvoiceForm() {
               </button>
             </div>
           )}
-        </div>
-
-
-{/*---------------- Invoice Title : ----------------------------------------------------- */}
-        <div className='border p-4 rounded border-slate-200'>
-          <label className="block mb-1 font-medium">Invoice Title *</label>
-          <input
-            type='text'
-            value={formData.title}
-            placeholder='Invoice Title'
-            className='border p-2 border-slate-200 w-full mb-2 rounded'
-            onChange={(e) => setFormData({title: e.target.value})}
-          />
         </div>
 
 

@@ -1,7 +1,0 @@
-name: sales-invoice-copy
-machineName: sales-invoice-copy
-status: false
-required: []
-props:
-  properties: []
-slots: []

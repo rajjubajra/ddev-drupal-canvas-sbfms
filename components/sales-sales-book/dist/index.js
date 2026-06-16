@@ -8,6 +8,39 @@ import Button from '@/components/utl-button';
 import Amount from '@/components/utl-amount';
 const client = new JsonApiClient();
 export default function sales_sales_book() {
+    /**--------------------------------------------------------------------------------------------
+  * Extract UUID from URL query parameters and fetch the corresponding purchase data via JSON:API.
+  * Then display the purchase details and provide a button to post a journal entry for the purchase.
+  -------------------------------------------------------------------------------------------*/ const [uuid, setUuid] = useState(null);
+    const [journalEntryNodeId, setJournalEntryNodeId] = useState(null);
+    const [isCheckingJournal, setIsCheckingJournal] = useState(false);
+    // Function to check for existing journal entry
+    const checkJournalEntry = (uuidParam)=>{
+        console.log('Checking journal entry for UUID:', uuidParam);
+        if (!uuidParam) return;
+        setIsCheckingJournal(true);
+        setJournalEntryNodeId(null);
+        // First get the purchase nid from UUID
+        fetch(`${window.location.origin}/jsonapi/node/sales_book/${uuidParam}`).then((res)=>res.json()).then((purchaseData)=>{
+            var _purchaseData_data_attributes, _purchaseData_data;
+            const purchaseNid = purchaseData === null || purchaseData === void 0 ? void 0 : (_purchaseData_data = purchaseData.data) === null || _purchaseData_data === void 0 ? void 0 : (_purchaseData_data_attributes = _purchaseData_data.attributes) === null || _purchaseData_data_attributes === void 0 ? void 0 : _purchaseData_data_attributes.drupal_internal__nid;
+            if (!purchaseNid) {
+                setIsCheckingJournal(false);
+                return;
+            }
+            // Then check if journal entry exists
+            return fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${'sales' + ' ' + String(uuidParam)}`).then((res)=>res.json()).then((result)=>{
+                var _result_data;
+                if ((result === null || result === void 0 ? void 0 : (_result_data = result.data) === null || _result_data === void 0 ? void 0 : _result_data.length) > 0) {
+                    setJournalEntryNodeId(result.data[0].attributes.drupal_internal__nid);
+                }
+                setIsCheckingJournal(false);
+            });
+        }).catch((err)=>{
+            console.error('Error checking journal entry:', err);
+            setIsCheckingJournal(false);
+        });
+    };
     /* --------------------------------------------------
          State: Date Filters (default = defined fiscal year)
     ------------------------------------------------------ */ const [datePickedFrom, setDatePickedFrom] = useState('');
@@ -73,8 +106,50 @@ export default function sales_sales_book() {
     if (isLoading) return /*#__PURE__*/ _jsx("div", {
         children: "Loading...."
     });
-    if (data && (data === null || data === void 0 ? void 0 : data.length) === 0) return /*#__PURE__*/ _jsx("div", {
-        children: "No data found.."
+    if (data && (data === null || data === void 0 ? void 0 : data.length) === 0) return /*#__PURE__*/ _jsxs("div", {
+        children: [
+            /*#__PURE__*/ _jsx(PageTitle, {
+                title: "Sales Book"
+            }),
+            /*#__PURE__*/ _jsxs("form", {
+                className: "flex flex-wrap gap-4 items-end mb-6 p-4 border rounded",
+                onSubmit: (e)=>e.preventDefault(),
+                children: [
+                    /*#__PURE__*/ _jsxs("div", {
+                        children: [
+                            /*#__PURE__*/ _jsx("label", {
+                                className: "block text-sm font-semibold mb-1",
+                                children: "Date From"
+                            }),
+                            /*#__PURE__*/ _jsx("input", {
+                                type: "date",
+                                value: dateFrom,
+                                onChange: (e)=>setDateFrom(e.target.value),
+                                className: "border px-2 py-1 rounded"
+                            })
+                        ]
+                    }),
+                    /*#__PURE__*/ _jsxs("div", {
+                        children: [
+                            /*#__PURE__*/ _jsx("label", {
+                                className: "block text-sm font-semibold mb-1",
+                                children: "Date To"
+                            }),
+                            /*#__PURE__*/ _jsx("input", {
+                                type: "date",
+                                value: dateTo,
+                                onChange: (e)=>setDateTo(e.target.value),
+                                className: "border px-2 py-1 rounded"
+                            })
+                        ]
+                    })
+                ]
+            }),
+            /*#__PURE__*/ _jsx("div", {
+                className: "text-lg",
+                children: "No data found..."
+            })
+        ]
     });
     return /*#__PURE__*/ _jsxs("div", {
         children: [
@@ -199,10 +274,22 @@ export default function sales_sales_book() {
                                         })
                                     }),
                                     /*#__PURE__*/ _jsx("div", {
-                                        className: "w-18",
-                                        children: /*#__PURE__*/ _jsx("a", {
-                                            href: `/sales-invoice-copy/?nodeId=${item.drupal_internal__nid}`,
-                                            children: "View Invoice"
+                                        children: /*#__PURE__*/ _jsx("div", {
+                                            className: "py-2 my-2 border-b border-slate-300",
+                                            children: /*#__PURE__*/ _jsx("div", {
+                                                className: "py-2",
+                                                children: isCheckingJournal ? /*#__PURE__*/ _jsx("button", {
+                                                    className: "cursor-wait px-4 py-2 border bg-slate-400 text-white",
+                                                    disabled: true,
+                                                    children: "Checking..."
+                                                }) : journalEntryNodeId ? /*#__PURE__*/ _jsx("a", {
+                                                    href: `/sales-invoice-copy/?nodeId=${item.drupal_internal__nid}`,
+                                                    children: "View Invoice"
+                                                }) : /*#__PURE__*/ _jsx("a", {
+                                                    href: `/invoice-post-journal/?nodeId=${item.drupal_internal__nid}`,
+                                                    children: "Post Journal entry"
+                                                })
+                                            })
                                         })
                                     })
                                 ]

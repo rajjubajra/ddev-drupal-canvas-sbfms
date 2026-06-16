@@ -17,6 +17,52 @@ const client = new JsonApiClient();
 
 export default function sales_sales_book(){
 
+ /**--------------------------------------------------------------------------------------------
+  * Extract UUID from URL query parameters and fetch the corresponding purchase data via JSON:API.
+  * Then display the purchase details and provide a button to post a journal entry for the purchase.
+  -------------------------------------------------------------------------------------------*/
+  const [uuid, setUuid] = useState(null);
+  const [journalEntryNodeId, setJournalEntryNodeId] = useState(null);
+  const [isCheckingJournal, setIsCheckingJournal] = useState(false);
+
+  // Function to check for existing journal entry
+  const checkJournalEntry = (uuidParam) => {
+    console.log('Checking journal entry for UUID:', uuidParam);
+    if (!uuidParam) return;
+
+    setIsCheckingJournal(true);
+    setJournalEntryNodeId(null);
+
+    // First get the purchase nid from UUID
+    fetch(`${window.location.origin}/jsonapi/node/sales_book/${uuidParam}`)
+      .then(res => res.json())
+      .then(purchaseData => {
+        const purchaseNid = purchaseData?.data?.attributes?.drupal_internal__nid;
+        if (!purchaseNid) {
+          setIsCheckingJournal(false);
+          return;
+        }
+        
+        // Then check if journal entry exists
+        return fetch(`/jsonapi/node/acc_journal_entry?filter[field_purchase_sale_reference_id]=${'sales' + ' ' + String(uuidParam)}`)
+          .then(res => res.json())
+          .then(result => {
+            if (result?.data?.length > 0) {
+              setJournalEntryNodeId(result.data[0].attributes.drupal_internal__nid);
+            }
+            setIsCheckingJournal(false);
+          });
+      })
+      .catch(err => {
+        console.error('Error checking journal entry:', err);
+        setIsCheckingJournal(false);
+      });
+  };
+
+
+
+
+
     /* --------------------------------------------------
          State: Date Filters (default = defined fiscal year)
     ------------------------------------------------------ */
@@ -113,7 +159,47 @@ export default function sales_sales_book(){
 
     if(isLoading) return <div>Loading....</div>
 
-    if(data && data?.length === 0) return  <div>No data found..</div>
+    if(data && data?.length === 0) return  <div>
+
+      <PageTitle title='Sales Book' />
+  {/*--------------------------------------------------- 
+    DATE FILTER FORM
+  ------------------------------------------------------*/}
+      <form
+        className="flex flex-wrap gap-4 items-end mb-6 p-4 border rounded"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Date From
+          </label>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Date To
+          </label>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="border px-2 py-1 rounded"
+          />
+        </div>
+      </form>
+      
+      <div className='text-lg'>
+        No data found...
+      </div>
+      
+      
+      </div>
 
     return(
         <div>
@@ -204,9 +290,32 @@ export default function sales_sales_book(){
                 <div className='w-32'>
                       <div><Amount amt={item.field_total_amount} /></div>
                 </div>
+
+                {/** VIEW INVOICE BUTTON 
                 <div className='w-18'>  
                   <a href={`/sales-invoice-copy/?nodeId=${item.drupal_internal__nid}`}>View Invoice</a>
                 </div>  
+                */}
+
+                <div>
+                  {/** JOURNAL ENTRY BUTTON  */}      
+    <div className='py-2 my-2 border-b border-slate-300'>             
+              {/* Journal Entry Post Button */}
+              <div className='py-2'>
+                {isCheckingJournal ? (
+                  <button className='cursor-wait px-4 py-2 border bg-slate-400 text-white' disabled>
+                    Checking...
+                  </button>
+                ) : journalEntryNodeId ? (
+                  
+                 <a href={`/invoice-post-journal/?nodeId=${item.drupal_internal__nid}`}>View Invoice</a>
+                ) : (
+                  <a href={`/invoice-post-journal/?nodeId=${item.drupal_internal__nid}`}>Post Journal entry</a>
+                )}
+              </div>
+      </div>
+          
+                </div>
                             
               </div>              
           </div>)

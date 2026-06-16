@@ -426,6 +426,13 @@ export default function InvoiceForm() {
         const fullUrl = `${baseUrl}?${queryString}`;
         window.location.href = fullUrl;
     }
+    /** update date and title */ const [invoiceTitle, setInvoiceTitle] = useState('');
+    const [invoiceDate, setInvoiceDate] = useState(dateToday);
+    useEffect(()=>{
+        setFormData(_object_spread_props(_object_spread({}, formData), {
+            title: 'Invoice - ' + dateToday
+        }));
+    }, []);
     /**
  * 
  * @returns POST INVOICE WITH RELATIONSHIP WITH INVOICE_ITEMS UUID
@@ -483,7 +490,9 @@ export default function InvoiceForm() {
             })
         ]
     });
-    return /*#__PURE__*/ _jsxs("div", {
+    /**
+   * UI - MAIN INVOICE FORM
+   */ return /*#__PURE__*/ _jsxs("div", {
         children: [
             /*#__PURE__*/ _jsx(PageTitle, {
                 title: "Invoice Form"
@@ -502,6 +511,24 @@ export default function InvoiceForm() {
                             submitError
                         ]
                     }),
+                    /*#__PURE__*/ _jsxs("div", {
+                        className: "border p-4 rounded border-slate-200",
+                        children: [
+                            /*#__PURE__*/ _jsx("label", {
+                                className: "block mb-1 font-medium",
+                                children: "Invoice Title *"
+                            }),
+                            /*#__PURE__*/ _jsx("input", {
+                                type: "text",
+                                value: formData.title,
+                                placeholder: "Invoice Title",
+                                className: "border p-2 border-slate-200 w-full mb-2 rounded",
+                                onChange: (e)=>setFormData(_object_spread_props(_object_spread({}, formData), {
+                                        title: e.target.value
+                                    }))
+                            })
+                        ]
+                    }),
                     /*#__PURE__*/ _jsx("div", {
                         className: "grid grid-cols-2 gap-4",
                         children: /*#__PURE__*/ _jsxs("div", {
@@ -515,7 +542,7 @@ export default function InvoiceForm() {
                                     children: [
                                         /*#__PURE__*/ _jsx("input", {
                                             type: "date",
-                                            value: formData.invoice_date,
+                                            value: invoiceDate,
                                             className: "p-2",
                                             onChange: (e)=>setFormData(_object_spread_props(_object_spread({}, formData), {
                                                     invoice_date: e.target.value
@@ -524,6 +551,7 @@ export default function InvoiceForm() {
                                         }),
                                         /*#__PURE__*/ _jsx("input", {
                                             type: "text",
+                                            hidden: true,
                                             value: formData.invoiceNumber,
                                             className: "p-2 w-full border-none",
                                             readOnly: true
@@ -597,24 +625,6 @@ export default function InvoiceForm() {
                                         children: "Change Customer"
                                     })
                                 ]
-                            })
-                        ]
-                    }),
-                    /*#__PURE__*/ _jsxs("div", {
-                        className: "border p-4 rounded border-slate-200",
-                        children: [
-                            /*#__PURE__*/ _jsx("label", {
-                                className: "block mb-1 font-medium",
-                                children: "Invoice Title *"
-                            }),
-                            /*#__PURE__*/ _jsx("input", {
-                                type: "text",
-                                value: formData.title,
-                                placeholder: "Invoice Title",
-                                className: "border p-2 border-slate-200 w-full mb-2 rounded",
-                                onChange: (e)=>setFormData({
-                                        title: e.target.value
-                                    })
                             })
                         ]
                     }),
